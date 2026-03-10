@@ -22,8 +22,8 @@
     header { background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.08); position: sticky; top: 0; z-index: 100; }
     nav { max-width: 1180px; margin: 0 auto; padding: 0 24px; height: 72px; display: flex; align-items: center; justify-content: space-between; }
     .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo-icon { width: 42px; height: 42px; background: var(--grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-    .logo-icon svg { width: 26px; height: 26px; }
+    .logo-icon { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .logo-icon img { width: 42px; height: 42px; object-fit: cover; border-radius: 10px; }
     .logo-text { font-size: 1.35rem; font-weight: 700; color: var(--dark); }
     .logo-text span { color: var(--teal); }
     .nav-links { display: flex; gap: 28px; list-style: none; }
@@ -136,9 +136,7 @@
   <nav>
     <a class="logo" href="#">
       <div class="logo-icon">
-        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 4H10a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h6a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4H6" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/>
-        </svg>
+        <img src="logo.jpg" alt="Synaptiv Learning" />
       </div>
       <span class="logo-text">Synaptiv <span>Learning</span></span>
     </a>

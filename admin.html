@@ -36,11 +36,12 @@
     }
     .login-logo {
       width: 58px; height: 58px;
-      background: var(--grad);
       border-radius: 14px;
+      overflow: hidden;
       display: inline-flex; align-items: center; justify-content: center;
       margin-bottom: 20px;
     }
+    .login-logo img { width: 58px; height: 58px; object-fit: cover; border-radius: 14px; }
     .login-logo svg { width: 32px; height: 32px; }
     .login-box h1 { font-size: 1.5rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
     .login-box p  { color: var(--muted); font-size: .88rem; margin-bottom: 28px; }
@@ -93,10 +94,11 @@
     }
     .sb-logo-icon {
       width: 36px; height: 36px;
-      background: var(--grad);
       border-radius: 9px;
+      overflow: hidden;
       display: flex; align-items: center; justify-content: center;
     }
+    .sb-logo-icon img { width: 36px; height: 36px; object-fit: cover; border-radius: 9px; }
     .sb-logo-icon svg { width: 22px; height: 22px; }
     .sb-logo-text { color: #fff; font-size: 1rem; font-weight: 700; line-height: 1.2; }
     .sb-logo-text small { display: block; color: rgba(255,255,255,.5); font-size: .7rem; font-weight: 400; }
@@ -364,9 +366,7 @@
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 4H10a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h6a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4H6" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/>
-      </svg>
+      <img src="logo.jpg" alt="Synaptiv Learning" />
     </div>
     <h1>Synaptiv Learning</h1>
     <p>Admin Portal — sign in to manage your courses</p>
@@ -382,9 +382,7 @@
   <aside class="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-icon">
-        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 4H10a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h6a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4H6" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/>
-        </svg>
+        <img src="logo.jpg" alt="Synaptiv" />
       </div>
       <div class="sb-logo-text">Synaptiv<br><small>Admin Portal</small></div>
     </div>
