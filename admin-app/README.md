@@ -1,56 +1,73 @@
-# Synaptiv Admin App
+# React + TypeScript + Vite
 
-A standalone React + TypeScript + TailwindCSS admin dashboard for managing Synaptiv Learning course batches.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Quick Start
+Currently, two official plugins are available:
 
-```bash
-cd admin-app
-npm install
-npm run dev
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-Opens at http://localhost:5173
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-**Default password:** `admin2025`
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## Features
-
-- Password-protected admin login (sessionStorage-based)
-- Course batch management: create, edit, delete
-- Stat cards: total batches, upcoming, estimated revenue
-- Search and filter by program
-- Export to CSV
-- Seed data auto-loads on first run (3 sample batches)
-- localStorage mock service (mirrors Amplify API shape)
-
-## Project Structure
-
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-admin-app/
-├── src/
-│   ├── types/index.ts              # CourseBatch + CourseBatchInput types
-│   ├── services/courseService.ts   # localStorage mock CRUD service
-│   ├── admin/courses/
-│   │   ├── CoursesPage.tsx         # Main page with stats, filters, table
-│   │   ├── CourseTable.tsx         # Table with edit/delete actions
-│   │   ├── CourseForm.tsx          # Shared form with validation
-│   │   ├── AddCourseModal.tsx      # Create modal
-│   │   └── EditCourseModal.tsx     # Edit modal
-│   ├── App.tsx                     # Auth gate + layout
-│   ├── main.tsx                    # Entry point
-│   └── index.css                   # Tailwind directives + utility classes
-├── amplify/data/resource.ts        # Amplify Gen2 schema (for future use)
-└── README.md
-```
-
-## Connect to AWS Amplify (optional)
-
-1. `npm install aws-amplify @aws-amplify/ui-react`
-2. `npx amplify init`
-3. `npx amplify add auth` (Cognito User Pools)
-4. `npx amplify add api` (GraphQL)
-5. Replace `src/services/courseService.ts` with real Amplify DataStore/API calls
-6. `npx amplify push`
-
-The `amplify/data/resource.ts` file contains the ready-to-use Amplify Gen2 schema.
