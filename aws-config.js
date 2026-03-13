@@ -6,8 +6,8 @@ const AWS_CONFIG = {
   region: 'us-east-1',            // e.g. us-east-1, ap-southeast-1
 
   cognito: {
-    userPoolId: 'REPLACE_USER_POOL_ID',      // e.g. us-east-1_AbCdEfGhI
-    clientId:   'REPLACE_APP_CLIENT_ID',     // e.g. 7abc123def456ghi789
+    userPoolId: 'us-east-1_k6A9bQbea',
+    clientId:   '7dubh5npu2nd4l1jms4biis09i',
   },
 
   api: {

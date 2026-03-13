@@ -131,10 +131,68 @@
     .spots-warn { color: #b45309; }
     .spots-full { color: #e53935; }
 
+    /* ── Testimonials ──────────────────────────────────────── */
+    .testimonials { background: #fff; }
+    .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .testi-card { background: var(--light); border-radius: 14px; padding: 28px 24px; position: relative; }
+    .testi-stars { color: #f59e0b; font-size: 1rem; margin-bottom: 12px; letter-spacing: 2px; }
+    .testi-quote { color: var(--dark); font-size: .93rem; line-height: 1.65; margin-bottom: 20px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .testi-name { font-weight: 700; font-size: .9rem; color: var(--dark); }
+    .testi-role { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Corporate training ─────────────────────────────────── */
+    .corporate { background: var(--dark); color: #fff; }
+    .corporate-inner { max-width: 1180px; margin: 0 auto; padding: 80px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .corporate-content .section-label { color: var(--teal); }
+    .corporate-content .section-title { color: #fff; }
+    .corporate-content .section-sub { color: rgba(255,255,255,.7); margin-bottom: 32px; }
+    .corp-perks { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px; }
+    .corp-perks li { display: flex; align-items: flex-start; gap: 12px; font-size: .92rem; color: rgba(255,255,255,.85); }
+    .corp-perks li::before { content: '✓'; background: var(--teal); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .corp-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .corp-stat { background: rgba(255,255,255,.07); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,.1); }
+    .corp-stat-num { font-size: 1.8rem; font-weight: 800; color: var(--teal); }
+    .corp-stat-lbl { font-size: .78rem; color: rgba(255,255,255,.6); margin-top: 4px; }
+
+    /* ── Contact ────────────────────────────────────────────── */
+    .contact { background: var(--light); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .contact-info { display: flex; flex-direction: column; gap: 24px; }
+    .contact-item { display: flex; gap: 16px; align-items: flex-start; }
+    .contact-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--grad); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .contact-item h4 { font-size: .9rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .contact-item p  { font-size: .85rem; color: var(--muted); }
+    .contact-form { background: #fff; border-radius: 16px; padding: 36px; box-shadow: 0 4px 24px rgba(0,0,0,.07); }
+    .contact-form h3 { font-size: 1.2rem; font-weight: 800; color: var(--dark); margin-bottom: 24px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .contact-form textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #d5dce8; border-radius: 8px; font-size: .93rem; color: var(--dark); font-family: inherit; resize: vertical; min-height: 110px; transition: border-color .2s; }
+    .contact-form textarea:focus { outline: none; border-color: var(--teal); }
+    .contact-form select { width: 100%; padding: 10px 14px; border: 1.5px solid #d5dce8; border-radius: 8px; font-size: .93rem; color: var(--dark); transition: border-color .2s; }
+    .contact-form select:focus { outline: none; border-color: var(--teal); }
+
+    /* ── Mobile nav ─────────────────────────────────────────── */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--dark); border-radius: 2px; transition: all .25s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: absolute; top: 72px; left: 0; right: 0; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.1); padding: 16px 24px 24px; z-index: 99; }
+    .mobile-menu.open { display: block; }
+    .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 0; }
+    .mobile-menu ul li a { display: block; padding: 12px 0; color: var(--muted); font-size: 1rem; font-weight: 500; text-decoration: none; border-bottom: 1px solid #edf0f5; }
+    .mobile-menu ul li:last-child a { border-bottom: none; background: var(--grad); color: #fff; text-align: center; border-radius: 8px; padding: 12px; margin-top: 12px; font-weight: 700; }
+
     @media (max-width: 680px) {
       .nav-links { display: none; }
+      .hamburger { display: flex; }
       .hero { padding: 64px 20px 56px; }
       .stats-inner { gap: 14px; }
+      .corporate-inner { grid-template-columns: 1fr; gap: 40px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 36px; }
+      .form-row { grid-template-columns: 1fr; }
+      .corp-stats { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -152,9 +210,25 @@
     <ul class="nav-links">
       <li><a href="#courses">Courses</a></li>
       <li><a href="#why">Why Us</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+      <li><a href="#corporate">Corporate</a></li>
+      <li><a href="#contact">Contact</a></li>
       <li><a href="#courses" class="nav-cta">Enroll Now</a></li>
     </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#courses" onclick="closeMobileMenu()">Courses</a></li>
+      <li><a href="#why" onclick="closeMobileMenu()">Why Us</a></li>
+      <li><a href="#testimonials" onclick="closeMobileMenu()">Testimonials</a></li>
+      <li><a href="#corporate" onclick="closeMobileMenu()">Corporate</a></li>
+      <li><a href="#contact" onclick="closeMobileMenu()">Contact</a></li>
+      <li><a href="#courses" onclick="closeMobileMenu()">Enroll Now</a></li>
+    </ul>
+  </div>
 </header>
 
 <!-- HERO -->
@@ -203,6 +277,160 @@
       <div class="feature"><div class="feature-icon">🤝</div><h4>Post-Training Support</h4><p>Access to instructor Q&amp;A, study groups, and coaching until you achieve your certification.</p></div>
       <div class="feature"><div class="feature-icon">🌍</div><h4>Global Community</h4><p>Join an alumni network of 1,200+ certified professionals across Africa, the Middle East, and beyond.</p></div>
       <div class="feature"><div class="feature-icon">🏅</div><h4>PDU / CDU Credits</h4><p>All programs deliver the professional development units needed to apply for or renew your certification.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="section-inner">
+    <div class="section-label">What Our Alumni Say</div>
+    <h2 class="section-title">Real Results from Real Professionals</h2>
+    <p class="section-sub">Join thousands who have advanced their careers with Synaptiv Learning.</p>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"The CBAP program was incredibly well-structured. The instructor's real-world examples made complex concepts click. Passed on my first attempt!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">AM</div>
+          <div>
+            <div class="testi-name">Aisha Mohammed</div>
+            <div class="testi-role">Senior Business Analyst, Dubai</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"I had failed PMP twice before joining Synaptiv. Their structured approach and mock exams gave me the confidence I needed. Got certified within 3 months!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">KO</div>
+          <div>
+            <div class="testi-name">Kwame Osei</div>
+            <div class="testi-role">Project Manager, Accra</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"The SAFe training was exactly what our team needed. We enrolled 8 people and every single one passed. Synaptiv's corporate package was excellent value."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">NR</div>
+          <div>
+            <div class="testi-name">Nadia Rahman</div>
+            <div class="testi-role">Agile Coach, Riyadh</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORPORATE TRAINING -->
+<section class="corporate" id="corporate">
+  <div class="corporate-inner">
+    <div class="corporate-content">
+      <div class="section-label">Corporate Training</div>
+      <h2 class="section-title">Upskill Your Entire Team</h2>
+      <p class="section-sub">We deliver customized, on-site or virtual training programs tailored to your organization's goals, culture, and industry.</p>
+      <ul class="corp-perks">
+        <li>Customized curriculum aligned to your business objectives</li>
+        <li>Flexible scheduling — weekends, evenings, or intensive formats</li>
+        <li>Dedicated account manager and post-training support</li>
+        <li>Group discounts for teams of 5 or more</li>
+        <li>Completion certificates and exam registration support</li>
+      </ul>
+      <a href="#contact" class="btn-white" style="display:inline-block; text-align:center; padding:14px 32px; font-weight:700; font-size:.97rem; text-decoration:none; border-radius:8px; color:#1a66cc;">Request a Corporate Quote</a>
+    </div>
+    <div class="corp-stats">
+      <div class="corp-stat"><div class="corp-stat-num">50+</div><div class="corp-stat-lbl">Corporate Clients</div></div>
+      <div class="corp-stat"><div class="corp-stat-num">500+</div><div class="corp-stat-lbl">Employees Trained</div></div>
+      <div class="corp-stat"><div class="corp-stat-num">10+</div><div class="corp-stat-lbl">Industries Served</div></div>
+      <div class="corp-stat"><div class="corp-stat-num">100%</div><div class="corp-stat-lbl">Client Satisfaction</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <div class="section-label">Get in Touch</div>
+    <h2 class="section-title">We'd Love to Hear From You</h2>
+    <p class="section-sub">Have questions about a program or want to explore corporate training? Reach out and we'll respond within 24 hours.</p>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <h4>Email Us</h4>
+            <p>info@synaptivlearning.com</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <h4>Call Us</h4>
+            <p>+1 (800) 123-4567</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🌍</div>
+          <div>
+            <h4>We Serve Globally</h4>
+            <p>Africa · Middle East · North America · Europe</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">⏰</div>
+          <div>
+            <h4>Office Hours</h4>
+            <p>Monday – Friday, 9:00 AM – 6:00 PM GMT</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <h3>Send Us a Message</h3>
+        <div id="contactFormContent">
+          <form onsubmit="submitContact(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cname">Name *</label>
+                <input type="text" id="cname" placeholder="Your full name" required />
+              </div>
+              <div class="form-group">
+                <label for="cemail">Email *</label>
+                <input type="email" id="cemail" placeholder="you@email.com" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cphone">Phone</label>
+              <input type="tel" id="cphone" placeholder="+1 234 567 8900" />
+            </div>
+            <div class="form-group">
+              <label for="ccourse">Course Interested In</label>
+              <select id="ccourse">
+                <option value="">— Select a course —</option>
+                <option>CBAP Certification Training</option>
+                <option>PMP Certification Training</option>
+                <option>Certified Scrum Master (CSM)</option>
+                <option>SAFe Scrum Master</option>
+                <option>SAFe POPM</option>
+                <option>Corporate Training</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="cmsg">Message *</label>
+              <textarea id="cmsg" placeholder="Tell us how we can help..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Send Message</button>
+          </form>
+        </div>
+        <div class="success-msg" id="contactSuccess">
+          <div class="check">✅</div>
+          <h3>Message Sent!</h3>
+          <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -447,6 +675,27 @@ function submitForm(e) {
 
 /* ── Init ───────────────────────────────────────────────────── */
 renderCards();
+
+/* ── Mobile hamburger ───────────────────────────────────────── */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+
+function closeMobileMenu() {
+  hamburger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+}
+
+/* ── Contact form ───────────────────────────────────────────── */
+function submitContact(e) {
+  e.preventDefault();
+  document.getElementById('contactFormContent').style.display = 'none';
+  document.getElementById('contactSuccess').style.display = 'block';
+}
 </script>
 </body>
 </html>
