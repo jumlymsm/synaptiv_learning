@@ -3,1093 +3,741 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Synaptiv Learning — Admin Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- Amazon Cognito Identity SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6/dist/amazon-cognito-identity.min.js"></script>
+  <title>Synaptiv — Admin Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    @font-face {
-      font-family: 'Coolvetica';
-      src: url('fonts/coolvetica.woff2') format('woff2'),
-           url('fonts/coolvetica.woff')  format('woff');
-      font-weight: normal; font-style: normal; font-display: swap;
-    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --teal:    #00b5a3;
-      --blue:    #1a66cc;
-      --dark:    #0f2a55;
-      --light:   #f0faff;
-      --muted:   #5a6a85;
-      --grad:    linear-gradient(135deg, #00b5a3 0%, #1a66cc 100%);
-      --sidebar: 240px;
-      --danger:  #e53935;
-      --warn:    #f59e0b;
-      --success: #10b981;
+      --teal:       #14b8a6;
+      --teal-dark:  #0d9488;
+      --teal-light: rgba(20,184,166,.15);
+      --dark:       #0f172a;
+      --sidebar-bg: #0d1b2e;
+      --sidebar-w:  210px;
+      --green:      #16a34a;
+      --orange:     #ea580c;
+      --red:        #ef4444;
+      --gray:       #64748b;
+      --border:     #e2e8f0;
+      --bg:         #f1f5f9;
     }
-    html, body { height: 100%; font-family: 'Coolvetica','Raleway','Segoe UI',sans-serif; color: #1a2340; background: #f1f5f9; }
+    html, body { height: 100%; font-family: 'Inter', system-ui, sans-serif; color: var(--dark); background: var(--bg); }
 
-    /* ── SPINNER OVERLAY ─────────────────────────────────── */
+    /* ── SIDEBAR ─── */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w);
+      background: var(--sidebar-bg); display: flex; flex-direction: column; z-index: 50;
+    }
+    .sb-brand {
+      padding: 22px 20px 18px; display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .sb-brand-icon {
+      width: 30px; height: 30px; background: var(--teal); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .sb-brand-icon svg { width: 16px; height: 16px; color: white; }
+    .sb-brand-text { font-size: .95rem; font-weight: 700; color: white; line-height: 1; }
+    .sb-brand-text span { color: var(--teal); }
+    .sb-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      color: rgba(255,255,255,.55); font-size: .83rem; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all .15s;
+      border: none; background: transparent; width: 100%; text-align: left; font-family: inherit;
+    }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .nav-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.9); }
+    .nav-item.active { background: var(--teal-light); color: #5eead4; }
+
+    /* ── MAIN ─── */
+    .main { margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar {
+      background: white; border-bottom: 1px solid var(--border);
+      height: 56px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 40;
+    }
+    .topbar h1 { font-size: 1rem; font-weight: 700; color: var(--dark); }
+    .btn-outline {
+      border: 1.5px solid var(--border); background: white; color: var(--dark);
+      padding: 6px 16px; border-radius: 20px; font-size: .78rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; font-family: inherit;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-outline:hover { border-color: #94a3b8; }
+    .content { padding: 24px 28px; flex: 1; }
+
+    /* ── STATS ─── */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: white; border-radius: 12px; padding: 24px 24px 20px; border: 1px solid var(--border); }
+    .stat-number { font-size: 2rem; font-weight: 700; color: var(--dark); line-height: 1; }
+    .stat-number.green  { color: var(--green); }
+    .stat-number.orange { color: var(--orange); }
+    .stat-label { font-size: .78rem; color: var(--gray); margin-top: 6px; }
+
+    /* ── TABLE CARD ─── */
+    .table-card { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+    .table-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 { font-size: .9rem; font-weight: 600; color: var(--dark); }
+    .btn-primary {
+      background: var(--teal); color: white; border: none; padding: 8px 16px; border-radius: 8px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center;
+      gap: 5px; font-family: inherit; transition: background .15s;
+    }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; padding: 10px 16px; font-size: .72rem; font-weight: 600;
+      color: var(--gray); background: #f8fafc; border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 13px 16px; font-size: .83rem; vertical-align: middle; color: var(--dark); }
+    .dash-col { color: var(--gray); }
+
+    /* Course cell */
+    .course-cell { display: flex; align-items: flex-start; gap: 10px; }
+    .course-icon {
+      width: 32px; height: 32px; background: #e0f2fe; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .course-icon svg { width: 15px; height: 15px; color: #0284c7; }
+    .course-name { font-weight: 600; font-size: .85rem; color: var(--dark); }
+    .course-desc { color: var(--gray); font-size: .75rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+
+    /* Vendor badge */
+    .vendor-badge {
+      display: inline-block; border: 1.5px solid #cbd5e1; border-radius: 20px;
+      padding: 3px 10px; font-size: .72rem; color: var(--dark); font-weight: 500;
+      white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Category badge */
+    .cat-badge {
+      display: inline-block; background: #f1f5f9; border-radius: 20px;
+      padding: 3px 10px; font-size: .72rem; color: var(--dark); font-weight: 500; white-space: nowrap;
+    }
+
+    /* Pricing */
+    .price-wrap .price-orig { text-decoration: line-through; color: var(--gray); font-size: .75rem; display: block; }
+    .price-wrap .price-disc { color: var(--teal); font-weight: 600; font-size: .83rem; }
+    .price-wrap .price-off  { color: var(--teal); font-size: .72rem; }
+
+    /* Status */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 500;
+    }
+    .status-draft { background: #f1f5f9; color: var(--gray); }
+    .status-live  { background: #dcfce7; color: var(--green); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .status-draft .status-dot { background: var(--gray); }
+    .status-live  .status-dot { background: var(--green); }
+
+    /* Toggle */
+    .tog { position: relative; display: inline-block; width: 38px; height: 21px; cursor: pointer; }
+    .tog input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .tog-track {
+      position: absolute; inset: 0; background: #cbd5e1; border-radius: 21px; transition: background .2s;
+    }
+    .tog-thumb {
+      position: absolute; top: 2.5px; left: 2.5px; width: 16px; height: 16px;
+      background: white; border-radius: 50%; transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .tog input:checked ~ .tog-track { background: var(--teal); }
+    .tog input:checked ~ .tog-thumb { transform: translateX(17px); }
+
+    /* Action buttons */
+    .action-btns { display: flex; gap: 4px; }
+    .act-btn {
+      border: none; background: transparent; cursor: pointer; padding: 6px; border-radius: 6px;
+      color: var(--gray); display: flex; align-items: center; justify-content: center; transition: all .12s;
+    }
+    .act-btn svg { width: 15px; height: 15px; }
+    .act-btn:hover { background: #f1f5f9; color: var(--dark); }
+    .act-btn.del { color: var(--red); }
+    .act-btn.del:hover { background: #fef2f2; }
+
+    /* ── COMING SOON ─── */
+    .coming-soon {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 60vh; color: var(--gray); text-align: center;
+    }
+    .coming-soon svg { width: 48px; height: 48px; margin-bottom: 16px; color: #cbd5e1; }
+    .coming-soon h2 { font-size: 1.1rem; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+    .coming-soon p { font-size: .85rem; }
+
+    /* ── MODAL ─── */
+    .overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      z-index: 200; align-items: center; justify-content: center; padding: 20px;
+    }
+    .overlay.open { display: flex; }
+    .modal-box {
+      background: white; border-radius: 16px; width: 100%; max-width: 540px;
+      max-height: 92vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,.22);
+    }
+    .modal-head {
+      padding: 22px 24px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: white; border-radius: 16px 16px 0 0; z-index: 1;
+    }
+    .modal-head h3 { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      background: #f1f5f9; border: none; border-radius: 6px; width: 30px; height: 30px;
+      cursor: pointer; color: var(--gray); display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+    .modal-body { padding: 20px 24px 24px; }
+    .modal-footer {
+      padding: 14px 24px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 8px;
+      position: sticky; bottom: 0; background: white; border-radius: 0 0 16px 16px;
+    }
+    .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .fg { margin-bottom: 14px; }
+    .fg label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: 5px; }
+    .fg input, .fg select, .fg textarea {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .85rem; font-family: inherit; color: var(--dark); transition: border-color .15s;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { outline: none; border-color: var(--teal); }
+    .fg textarea { resize: vertical; min-height: 70px; }
+    .btn-cancel {
+      background: #f1f5f9; color: var(--gray); border: none; padding: 9px 18px; border-radius: 8px;
+      font-size: .83rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .btn-cancel:hover { background: #e2e8f0; }
+
+    /* ── CONFIRM ─── */
+    .confirm-box {
+      background: white; border-radius: 14px; padding: 32px 28px;
+      max-width: 360px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,.22); text-align: center;
+    }
+    .confirm-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .confirm-box p { color: var(--gray); font-size: .83rem; margin-bottom: 22px; }
+    .confirm-btns { display: flex; gap: 8px; justify-content: center; }
+    .btn-danger {
+      background: var(--red); color: white; border: none; padding: 9px 20px;
+      border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .btn-danger:hover { opacity: .88; }
+
+    /* ── TOAST ─── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; background: var(--dark); color: white;
+      padding: 11px 20px; border-radius: 9px; font-size: .83rem; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,.22); transform: translateY(70px); opacity: 0;
+      transition: transform .25s, opacity .25s; z-index: 999;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.t-ok  { background: #16a34a; }
+    #toast.t-err { background: var(--red); }
+
+    /* ── SPINNER ─── */
     #spinner {
       display: none; position: fixed; inset: 0; z-index: 9999;
-      background: rgba(255,255,255,.55); backdrop-filter: blur(2px);
-      align-items: center; justify-content: center;
+      background: rgba(255,255,255,.5); align-items: center; justify-content: center;
     }
     #spinner.on { display: flex; }
     .spin-ring {
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 4px solid #e2e8f0; border-top-color: var(--teal);
-      animation: spin .7s linear infinite;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 3px solid var(--border); border-top-color: var(--teal);
+      animation: spin .65s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── LOGIN ───────────────────────────────────────────── */
-    #loginScreen {
-      min-height: 100vh; display: flex;
-      align-items: center; justify-content: center;
-      background: var(--grad);
-    }
-    .login-box {
-      background: #fff; border-radius: 20px;
-      padding: 48px 44px; width: 100%; max-width: 400px;
-      box-shadow: 0 32px 80px rgba(0,0,0,.22); text-align: center;
-    }
-    .login-logo { width: 58px; height: 58px; border-radius: 14px; overflow: hidden;
-      display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-    .login-logo img { width: 58px; height: 58px; object-fit: cover; border-radius: 14px; }
-    .login-box h1 { font-size: 1.5rem; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
-    .login-box p  { color: var(--muted); font-size: .88rem; margin-bottom: 28px; }
-    .login-box input {
-      width: 100%; padding: 12px 16px;
-      border: 1.5px solid #d5dce8; border-radius: 10px;
-      font-size: 1rem; margin-bottom: 14px; transition: border-color .2s;
-      font-family: inherit;
-    }
-    .login-box input:focus { outline: none; border-color: var(--teal); }
-    .login-box button {
-      width: 100%; background: var(--grad); color: #fff; border: none;
-      border-radius: 10px; padding: 13px; font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: opacity .2s; font-family: inherit;
-    }
-    .login-box button:hover { opacity: .88; }
-    .login-error { color: var(--danger); font-size: .83rem; margin-top: 10px; min-height: 18px; }
-    .aws-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #f0faff; color: var(--blue); border-radius: 20px;
-      padding: 4px 12px; font-size: .75rem; font-weight: 600; margin-top: 16px;
-    }
-
-    /* ── APP SHELL ───────────────────────────────────────── */
-    #appShell { display: none; min-height: 100vh;
-      grid-template-columns: var(--sidebar) 1fr; }
-    #appShell.visible { display: grid; }
-
-    /* ── SIDEBAR ─────────────────────────────────────────── */
-    .sidebar {
-      background: var(--dark); display: flex; flex-direction: column;
-      position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar); z-index: 50;
-    }
-    .sb-logo { display: flex; align-items: center; gap: 10px;
-      padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,255,255,.1); }
-    .sb-logo-icon { width: 36px; height: 36px; border-radius: 9px; overflow: hidden;
-      display: flex; align-items: center; justify-content: center; }
-    .sb-logo-icon img { width: 36px; height: 36px; object-fit: cover; border-radius: 9px; }
-    .sb-logo-text { color: #fff; font-size: 1rem; font-weight: 700; line-height: 1.2; }
-    .sb-logo-text small { display: block; color: rgba(255,255,255,.5); font-size: .7rem; font-weight: 400; }
-    .sb-nav { flex: 1; padding: 16px 10px; display: flex; flex-direction: column; gap: 4px; }
-    .sb-item {
-      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
-      border-radius: 9px; color: rgba(255,255,255,.6);
-      font-size: .88rem; font-weight: 500; cursor: pointer;
-      text-decoration: none; transition: background .15s, color .15s;
-      border: none; background: transparent; width: 100%; text-align: left; font-family: inherit;
-    }
-    .sb-item:hover  { background: rgba(255,255,255,.08); color: #fff; }
-    .sb-item.active { background: rgba(0,181,163,.2); color: var(--teal); }
-    .sb-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .sb-divider { height: 1px; background: rgba(255,255,255,.1); margin: 8px 10px; }
-    .sb-logout { padding: 16px 10px; }
-    .sb-user {
-      padding: 12px 20px; border-top: 1px solid rgba(255,255,255,.1);
-      color: rgba(255,255,255,.55); font-size: .75rem;
-    }
-    .sb-user strong { display: block; color: #fff; font-size: .82rem; margin-bottom: 1px; }
-
-    /* ── MAIN ────────────────────────────────────────────── */
-    .main { margin-left: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; width: calc(100% - var(--sidebar)); }
-    .topbar {
-      background: #fff; height: 64px; border-bottom: 1px solid #e2e8f0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 32px; position: sticky; top: 0; z-index: 40;
-    }
-    .topbar h2 { font-size: 1.15rem; font-weight: 700; color: var(--dark); }
-    .topbar-right { display: flex; align-items: center; gap: 12px; }
-    .admin-badge {
-      background: var(--light); color: var(--blue);
-      font-size: .78rem; font-weight: 700; padding: 4px 12px; border-radius: 30px;
-    }
-    .content { padding: 32px; flex: 1; }
-
-    /* ── VIEWS ───────────────────────────────────────────── */
+    /* ── VIEWS ─── */
     .view { display: none; }
     .view.active { display: block; }
-
-    /* ── STAT CARDS ──────────────────────────────────────── */
-    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 20px; margin-bottom: 32px; }
-    .stat-card { background: #fff; border-radius: 14px; padding: 22px 24px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-    .stat-card .sc-label { font-size: .75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-    .stat-card .sc-value { font-size: 2rem; font-weight: 800; color: var(--dark); }
-    .stat-card .sc-icon  { font-size: 1.6rem; margin-bottom: 8px; }
-
-    /* ── TABLE ───────────────────────────────────────────── */
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .section-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--dark); }
-    .table-wrap { background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06); overflow: hidden; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    thead th { text-align: left; padding: 14px 20px; font-size: .75rem; font-weight: 700;
-      color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
-      background: #f8fafc; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid #f0f4f8; transition: background .12s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #fafbff; }
-    tbody td { padding: 14px 20px; font-size: .9rem; color: var(--dark); vertical-align: middle; }
-    .course-name-cell { font-weight: 600; }
-    .course-name-cell small { display: block; color: var(--muted); font-weight: 400; font-size: .78rem; }
-    .badge-pill { display: inline-block; background: var(--light); color: var(--blue); font-size: .72rem; font-weight: 700; padding: 3px 10px; border-radius: 30px; }
-    .quota-bar { width: 90px; }
-    .quota-track { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin-top: 4px; }
-    .quota-fill { height: 100%; background: var(--grad); border-radius: 3px; transition: width .3s; }
-    .quota-fill.warn { background: var(--warn); }
-    .quota-fill.full { background: var(--danger); }
-    .actions { display: flex; gap: 8px; }
-    .btn-sm { padding: 6px 12px; border-radius: 6px; font-size: .78rem; font-weight: 600;
-      cursor: pointer; border: none; transition: opacity .15s, transform .12s; font-family: inherit; }
-    .btn-sm:hover { opacity: .82; transform: translateY(-1px); }
-    .btn-edit    { background: #e8f0fe; color: var(--blue); }
-    .btn-session { background: #e6f9f7; color: #008878; }
-    .btn-del     { background: #fde8e8; color: var(--danger); }
-    .empty-row td { text-align: center; color: var(--muted); padding: 40px; font-size: .9rem; }
-
-    /* ── PRIMARY BUTTON ──────────────────────────────────── */
-    .btn-primary { background: var(--grad); color: #fff; border: none; padding: 10px 20px; border-radius: 8px;
-      font-size: .88rem; font-weight: 700; cursor: pointer; transition: opacity .15s;
-      display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-    .btn-primary:hover { opacity: .88; }
-
-    /* ── MODAL ───────────────────────────────────────────── */
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.48);
-      z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-    .overlay.open { display: flex; }
-    .modal-box { background: #fff; border-radius: 18px; width: 100%; max-width: 580px;
-      max-height: 92vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,0,0,.22); position: relative; }
-    .modal-box.wide { max-width: 820px; }
-    .modal-head { padding: 26px 28px 20px; border-bottom: 1px solid #edf0f5;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; background: #fff; border-radius: 18px 18px 0 0; z-index: 1; }
-    .modal-head h3 { font-size: 1.1rem; font-weight: 800; color: var(--dark); }
-    .modal-close-btn { background: #f1f5f9; border: none; border-radius: 6px;
-      width: 32px; height: 32px; font-size: 1.1rem; cursor: pointer; color: var(--muted);
-      display: flex; align-items: center; justify-content: center; }
-    .modal-body { padding: 24px 28px 28px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: .8rem; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 10px 13px; border: 1.5px solid #d5dce8; border-radius: 8px;
-      font-size: .9rem; color: var(--dark); font-family: inherit; transition: border-color .2s; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--teal); }
-    .form-group textarea { resize: vertical; min-height: 80px; }
-    .form-hint { font-size: .75rem; color: var(--muted); margin-top: 3px; }
-    .form-section-title { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase;
-      letter-spacing: .06em; padding: 14px 0 8px; border-top: 1px solid #edf0f5; margin-top: 8px; }
-    .modal-footer { padding: 16px 28px; border-top: 1px solid #edf0f5;
-      display: flex; justify-content: flex-end; gap: 10px;
-      position: sticky; bottom: 0; background: #fff; border-radius: 0 0 18px 18px; }
-    .btn-cancel { background: #f1f5f9; color: var(--muted); border: none; padding: 10px 20px;
-      border-radius: 8px; font-size: .88rem; font-weight: 600; cursor: pointer; transition: background .15s; font-family: inherit; }
-    .btn-cancel:hover { background: #e2e8f0; }
-    .input-prefix { display: flex; }
-    .input-prefix span { background: #f8fafc; border: 1.5px solid #d5dce8; border-right: none;
-      border-radius: 8px 0 0 8px; padding: 10px 12px; font-size: .88rem; color: var(--muted); white-space: nowrap; }
-    .input-prefix input { border-radius: 0 8px 8px 0; }
-
-    /* ── SESSIONS MODAL ──────────────────────────────────── */
-    .sessions-table-wrap { overflow-x: auto; }
-    .sess-table { width: 100%; border-collapse: collapse; }
-    .sess-table th { text-align: left; padding: 10px 14px; font-size: .73rem; font-weight: 700;
-      color: var(--muted); text-transform: uppercase; letter-spacing: .05em;
-      background: #f8fafc; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-    .sess-table td { padding: 10px 14px; border-bottom: 1px solid #f0f4f8; font-size: .88rem; vertical-align: middle; }
-    .sess-table tr:last-child td { border-bottom: none; }
-    .sess-inline-form { display: none; background: #f8fafc; }
-    .sess-inline-form.open { display: table-row; }
-    .sess-inline-form td { padding: 12px 14px; }
-    .inline-fields { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-    .inline-fields input, .inline-fields select {
-      padding: 8px 10px; border: 1.5px solid #d5dce8; border-radius: 7px;
-      font-size: .85rem; color: var(--dark); font-family: inherit; }
-    .inline-fields input:focus, .inline-fields select:focus { outline: none; border-color: var(--teal); }
-    .if-date    { flex: 1; min-width: 160px; }
-    .if-lect    { flex: 1; min-width: 140px; }
-    .if-quota   { width: 80px; }
-    .if-enrl    { width: 80px; }
-    .if-amount  { width: 100px; }
-    .if-disc    { width: 80px; }
-    .spots-badge { display: inline-block; font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 30px; }
-    .spots-ok   { background: #e6f9f7; color: #008878; }
-    .spots-warn { background: #fff3e0; color: #b45309; }
-    .spots-full { background: #fde8e8; color: var(--danger); }
-    .price-chip { font-size: .78rem; font-weight: 600; color: var(--blue);
-      background: var(--light); padding: 2px 8px; border-radius: 20px; }
-
-    /* ── CONFIRM MODAL ───────────────────────────────────── */
-    .confirm-box { background: #fff; border-radius: 16px; padding: 36px 32px;
-      max-width: 380px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,.22); text-align: center; }
-    .confirm-icon { font-size: 2.5rem; margin-bottom: 14px; }
-    .confirm-box h3 { font-size: 1.15rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
-    .confirm-box p  { color: var(--muted); font-size: .88rem; margin-bottom: 24px; }
-    .confirm-btns   { display: flex; gap: 10px; justify-content: center; }
-    .btn-danger { background: var(--danger); color: #fff; border: none;
-      padding: 10px 22px; border-radius: 8px; font-size: .9rem; font-weight: 700;
-      cursor: pointer; transition: opacity .15s; font-family: inherit; }
-    .btn-danger:hover { opacity: .85; }
-
-    /* ── TOAST ───────────────────────────────────────────── */
-    #toast { position: fixed; bottom: 28px; right: 28px; background: var(--dark); color: #fff;
-      padding: 13px 22px; border-radius: 10px; font-size: .88rem; font-weight: 600;
-      box-shadow: 0 8px 30px rgba(0,0,0,.22); transform: translateY(80px); opacity: 0;
-      transition: transform .28s, opacity .28s; z-index: 999;
-      display: flex; align-items: center; gap: 10px; }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.t-success { background: var(--success); }
-    #toast.t-error   { background: var(--danger); }
-
-    /* ── COLOUR SWATCHES ─────────────────────────────────── */
-    .swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-    .swatch { width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
-      border: 2px solid transparent; transition: border-color .15s, transform .12s; }
-    .swatch:hover  { transform: scale(1.12); }
-    .swatch.picked { border-color: var(--dark); }
-
-    /* ── SETUP NOTICE ────────────────────────────────────── */
-    .setup-notice {
-      background: #fff3e0; border: 1.5px solid #f59e0b; border-radius: 10px;
-      padding: 14px 18px; margin-bottom: 24px; font-size: .85rem; color: #92400e;
-      display: none;
-    }
-    .setup-notice.show { display: block; }
-    .setup-notice strong { display: block; margin-bottom: 4px; }
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--gray); font-size: .85rem; }
   </style>
 </head>
 <body>
 
-<!-- AWS Config (fill in after setup) -->
-<script src="aws-config.js"></script>
-
-<!-- ══ SPINNER ════════════════════════════════════════════ -->
 <div id="spinner"><div class="spin-ring"></div></div>
 
-<!-- ══ LOGIN ══════════════════════════════════════════════ -->
-<div id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo"><img src="logo.jpg" alt="Synaptiv Learning" /></div>
-    <h1>Synaptiv Learning</h1>
-    <p>Admin Portal — sign in with your AWS account</p>
-    <input type="email"    id="emailInput" placeholder="Admin email address"
-           onkeydown="if(event.key==='Enter')login()" autocomplete="username" />
-    <input type="password" id="pwInput"    placeholder="Password"
-           onkeydown="if(event.key==='Enter')login()" autocomplete="current-password" />
-    <button onclick="login()">Sign In</button>
-    <div class="login-error" id="loginErr"></div>
-    <div class="aws-badge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Secured by AWS Cognito
+<!-- ══ APP ══ -->
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
     </div>
+    <div class="sb-brand-text">Admin <span>Portal</span></div>
   </div>
+
+  <nav class="sb-nav">
+    <button class="nav-item" onclick="switchView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item active" id="nav-courses" onclick="switchView('courses')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Courses
+    </button>
+    <button class="nav-item" onclick="switchView('batches')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Batches
+    </button>
+    <button class="nav-item" onclick="switchView('registrations')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Registrations
+    </button>
+    <button class="nav-item" onclick="switchView('discounts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Discounts
+    </button>
+    <button class="nav-item" onclick="switchView('trainers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg>
+      Trainers
+    </button>
+  </nav>
 </div>
 
-<!-- ══ APP SHELL ══════════════════════════════════════════ -->
-<div id="appShell">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-icon"><img src="logo.jpg" alt="Synaptiv" /></div>
-      <div class="sb-logo-text">Synaptiv<br><small>Admin Portal</small></div>
-    </div>
-    <nav class="sb-nav">
-      <button class="sb-item active" id="nav-dashboard" onclick="showView('dashboard')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Dashboard
-      </button>
-      <button class="sb-item" id="nav-courses" onclick="showView('courses')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Courses
-      </button>
-      <div class="sb-divider"></div>
-      <a class="sb-item" href="index.html" target="_blank">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        View Website
-      </a>
-    </nav>
-    <div class="sb-user" id="sbUserInfo"></div>
-    <div class="sb-logout">
-      <button class="sb-item" onclick="logout()" style="color:#f87171;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sign Out
-      </button>
-    </div>
-  </aside>
+<div class="main">
+  <!-- Topbar -->
+  <div class="topbar">
+    <h1 id="pageTitle">Courses</h1>
+    <a href="index.html" class="btn-outline" target="_blank">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      View Live Site
+    </a>
+  </div>
 
-  <!-- Main -->
-  <div class="main">
-    <div class="topbar">
-      <h2 id="pageTitle">Dashboard</h2>
-      <div class="topbar-right">
-        <span class="admin-badge" id="topAdminBadge">Admin</span>
-      </div>
-    </div>
-    <div class="content">
+  <div class="content">
 
-      <!-- Setup notice (shown when AWS not configured) -->
-      <div class="setup-notice" id="setupNotice">
-        <strong>AWS not yet configured</strong>
-        Open <code>aws-config.js</code> and fill in your Cognito User Pool ID, App Client ID, and API Gateway URL.
-        Data is saved locally until AWS is connected.
-      </div>
-
-      <!-- DASHBOARD -->
-      <div class="view active" id="view-dashboard">
-        <div class="stat-cards" id="dashStats"></div>
-        <div class="section-header"><h3>Quick Actions</h3></div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="btn-primary" onclick="showView('courses');openCourseModal()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add New Course
-          </button>
-          <button class="btn-primary" style="background:#0f2a55;" onclick="showView('courses')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            Manage Courses
-          </button>
+    <!-- ── COURSES VIEW ── -->
+    <div class="view active" id="view-courses">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-total">0</div>
+          <div class="stat-label">Total Courses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number green" id="stat-published">0</div>
+          <div class="stat-label">Published</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number orange" id="stat-draft">0</div>
+          <div class="stat-label">Draft</div>
         </div>
       </div>
 
-      <!-- COURSES -->
-      <div class="view" id="view-courses">
-        <div class="section-header">
-          <h3>All Courses</h3>
-          <button class="btn-primary" onclick="openCourseModal()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Course
+      <div class="table-card">
+        <div class="table-header">
+          <h2>All Courses</h2>
+          <button class="btn-primary" onclick="openAdd()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Course
           </button>
         </div>
-        <div class="table-wrap">
+        <div class="tbl-wrap">
           <table>
-            <thead><tr>
-              <th>Course</th>
-              <th>Badge</th>
-              <th>Price</th>
-              <th>Discount</th>
-              <th>Sessions</th>
-              <th>Seats</th>
-              <th>Enrolled</th>
-              <th>Actions</th>
-            </tr></thead>
-            <tbody id="coursesTableBody"></tbody>
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Vendor</th>
+                <th>Category</th>
+                <th>Duration</th>
+                <th>Seats</th>
+                <th>Pricing</th>
+                <th>Status</th>
+                <th>Published</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="courseTbody"></tbody>
           </table>
         </div>
       </div>
+    </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /appShell -->
+    <!-- ── DASHBOARD VIEW ── -->
+    <div class="view" id="view-dashboard">
+      <div class="coming-soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <h2>Dashboard</h2>
+        <p>Analytics and overview — coming soon.</p>
+      </div>
+    </div>
 
-<!-- ══ COURSE MODAL ════════════════════════════════════════ -->
+    <!-- ── BATCHES VIEW ── -->
+    <div class="view" id="view-batches">
+      <div class="coming-soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <h2>Batches</h2>
+        <p>Schedule and manage course batches — coming soon.</p>
+      </div>
+    </div>
+
+    <!-- ── REGISTRATIONS VIEW ── -->
+    <div class="view" id="view-registrations">
+      <div class="coming-soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <h2>Registrations</h2>
+        <p>View and manage learner registrations — coming soon.</p>
+      </div>
+    </div>
+
+    <!-- ── DISCOUNTS VIEW ── -->
+    <div class="view" id="view-discounts">
+      <div class="coming-soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <h2>Discounts</h2>
+        <p>Create and manage promotional discounts — coming soon.</p>
+      </div>
+    </div>
+
+    <!-- ── TRAINERS VIEW ── -->
+    <div class="view" id="view-trainers">
+      <div class="coming-soon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/></svg>
+        <h2>Trainers</h2>
+        <p>Manage trainer profiles and assignments — coming soon.</p>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══ ADD/EDIT MODAL ══ -->
 <div class="overlay" id="courseOverlay">
   <div class="modal-box">
     <div class="modal-head">
-      <h3 id="courseModalTitle">Add Course</h3>
-      <button class="modal-close-btn" onclick="closeCourseModal()">&#x2715;</button>
+      <h3 id="modalTitle">New Course</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="cf-id" />
-      <div class="form-row">
-        <div class="form-group">
-          <label>Short Name *</label>
-          <input type="text" id="cf-short" placeholder="e.g. CBAP" />
+      <input type="hidden" id="editId" />
+      <div class="fg">
+        <label>Course Name *</label>
+        <input type="text" id="fName" placeholder="e.g. PMP Certification Training" />
+      </div>
+      <div class="fg">
+        <label>Short Description</label>
+        <textarea id="fDesc" placeholder="Brief description shown in the course table..."></textarea>
+      </div>
+      <div class="form-row2">
+        <div class="fg">
+          <label>Vendor / Certification Body</label>
+          <input type="text" id="fVendor" placeholder="e.g. PMI (Project Management Institute)" />
         </div>
-        <div class="form-group">
-          <label>Badge Text *</label>
-          <input type="text" id="cf-badge" placeholder="e.g. IIBA Certified" />
+        <div class="fg">
+          <label>Category</label>
+          <select id="fCategory">
+            <option value="">— Select —</option>
+            <option>Agile</option>
+            <option>Business Analysis</option>
+            <option>Project Management</option>
+            <option>Data &amp; AI</option>
+            <option>Leadership</option>
+            <option>IT &amp; Cloud</option>
+            <option>Other</option>
+          </select>
         </div>
       </div>
-      <div class="form-group">
-        <label>Full Course Name *</label>
-        <input type="text" id="cf-name" placeholder="e.g. CBAP – Certified Business Analysis Professional" />
-      </div>
-      <div class="form-group">
-        <label>Description *</label>
-        <textarea id="cf-desc" placeholder="Short description shown on the course card..."></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
+      <div class="form-row2">
+        <div class="fg">
           <label>Duration</label>
-          <input type="text" id="cf-duration" placeholder="e.g. 5 Days (40 Hours)" />
+          <input type="text" id="fDuration" placeholder="e.g. 3 Days" />
         </div>
-        <div class="form-group">
-          <label>Format / Mode</label>
-          <input type="text" id="cf-format" placeholder="e.g. Live Online & In-Person" />
-        </div>
-      </div>
-
-      <div class="form-section-title">Pricing</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Base Amount (USD) *</label>
-          <div class="input-prefix">
-            <span>$</span>
-            <input type="number" id="cf-amount" placeholder="1950" min="0" step="0.01" />
-          </div>
-          <div class="form-hint">Numeric amount used for calculations</div>
-        </div>
-        <div class="form-group">
-          <label>Discount (%)</label>
-          <div class="input-prefix">
-            <span>%</span>
-            <input type="number" id="cf-discount" placeholder="0" min="0" max="100" step="1" />
-          </div>
-          <div class="form-hint">Early-bird or group discount percentage</div>
+        <div class="fg">
+          <label>Max Seats</label>
+          <input type="number" id="fSeats" placeholder="e.g. 20" min="1" />
         </div>
       </div>
-      <div class="form-group">
-        <label>Display Price Label</label>
-        <input type="text" id="cf-price" placeholder="e.g. $1,950 per participant" />
-        <div class="form-hint">Shown on the landing page (free-text override)</div>
+      <div class="form-row2">
+        <div class="fg">
+          <label>List Price (USD)</label>
+          <input type="number" id="fListPrice" placeholder="e.g. 1500" min="0" step="0.01" />
+        </div>
+        <div class="fg">
+          <label>Discounted Price (USD)</label>
+          <input type="number" id="fDiscPrice" placeholder="e.g. 999" min="0" step="0.01" />
+        </div>
       </div>
-
-      <div class="form-section-title">Appearance</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Icon (emoji)</label>
-          <input type="text" id="cf-icon" placeholder="📊" maxlength="4" />
-        </div>
-        <div class="form-group">
-          <label>Icon Background</label>
-          <input type="text" id="cf-iconbg" placeholder="#e6f9f7" />
-          <div class="swatches" id="swatchList"></div>
-        </div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="fStatus">
+          <option value="draft">Draft</option>
+          <option value="live">Live</option>
+        </select>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeCourseModal()">Cancel</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-primary" onclick="saveCourse()">Save Course</button>
     </div>
   </div>
 </div>
 
-<!-- ══ SESSIONS MODAL ══════════════════════════════════════ -->
-<div class="overlay" id="sessOverlay">
-  <div class="modal-box wide">
-    <div class="modal-head">
-      <h3 id="sessModalTitle">Manage Sessions</h3>
-      <button class="modal-close-btn" onclick="closeSessModal()">&#x2715;</button>
-    </div>
-    <div class="modal-body" style="padding-top:16px;">
-      <input type="hidden" id="sess-course-id" />
-      <div style="margin-bottom:14px;">
-        <button class="btn-primary" onclick="addSessionRow()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Session
-        </button>
-      </div>
-      <div class="sessions-table-wrap">
-        <table class="sess-table">
-          <thead><tr>
-            <th>Date / Label</th>
-            <th>Lecturer</th>
-            <th>Quota</th>
-            <th>Enrolled</th>
-            <th>Price Override</th>
-            <th>Discount %</th>
-            <th>Spots</th>
-            <th>Actions</th>
-          </tr></thead>
-          <tbody id="sessTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeSessModal()">Done</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ CONFIRM MODAL ══════════════════════════════════════ -->
+<!-- ══ CONFIRM DELETE MODAL ══ -->
 <div class="overlay" id="confirmOverlay">
   <div class="confirm-box">
-    <div class="confirm-icon">⚠️</div>
-    <h3 id="confirmTitle">Are you sure?</h3>
+    <h3>Delete Course?</h3>
     <p id="confirmMsg">This action cannot be undone.</p>
     <div class="confirm-btns">
       <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
-      <button class="btn-danger" id="confirmBtn">Delete</button>
+      <button class="btn-danger" onclick="confirmDelete()">Delete</button>
     </div>
   </div>
 </div>
 
-<!-- ══ TOAST ═══════════════════════════════════════════════ -->
+<!-- ══ TOAST ══ -->
 <div id="toast"></div>
 
 <script>
-/* ───────────────────────────────────────────────────────────
-   HELPERS
-─────────────────────────────────────────────────────────── */
+/* ── STORAGE ── */
 const STORAGE_KEY = 'synaptiv_courses_v2';
-const SWATCHES    = ['#e6f9f7','#e8f0fe','#fff3e0','#fce4ec','#f3e8ff','#e0f2fe','#dcfce7','#fef9c3'];
 
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-
-function spin(on) {
-  document.getElementById('spinner').classList.toggle('on', on);
-}
-
-function toast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show t-' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = ''; }, 2800);
-}
-
-function fmtMoney(n) {
-  if (!n && n !== 0) return '—';
-  return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-}
-
-/* ───────────────────────────────────────────────────────────
-   AWS STATE
-─────────────────────────────────────────────────────────── */
-let currentToken   = null;   // Cognito JWT ID token
-let currentUser    = null;   // CognitoUser object
-let awsConfigured  = false;
-
-function checkAwsConfig() {
-  try {
-    awsConfigured = (
-      AWS_CONFIG.cognito.userPoolId !== 'REPLACE_USER_POOL_ID' &&
-      AWS_CONFIG.api.endpoint       !== 'REPLACE_API_GATEWAY_URL'
-    );
-  } catch(e) { awsConfigured = false; }
-  return awsConfigured;
-}
-
-/* ───────────────────────────────────────────────────────────
-   COGNITO AUTH
-─────────────────────────────────────────────────────────── */
-function getCognitoPool() {
-  return new AmazonCognitoIdentity.CognitoUserPool({
-    UserPoolId: AWS_CONFIG.cognito.userPoolId,
-    ClientId:   AWS_CONFIG.cognito.clientId,
-  });
-}
-
-function login() {
-  const email = document.getElementById('emailInput').value.trim();
-  const pw    = document.getElementById('pwInput').value;
-  document.getElementById('loginErr').textContent = '';
-
-  if (!email || !pw) {
-    document.getElementById('loginErr').textContent = 'Enter email and password.';
-    return;
-  }
-
-  // If AWS not configured yet → demo mode with any non-empty credentials
-  if (!checkAwsConfig()) {
-    document.getElementById('loginErr').textContent = '';
-    currentToken = 'demo';
-    showApp(email);
-    document.getElementById('setupNotice').classList.add('show');
-    return;
-  }
-
-  spin(true);
-  const authDetails = new AmazonCognitoIdentity.AuthenticationDetails({ Username: email, Password: pw });
-  const cognitoUser = new AmazonCognitoIdentity.CognitoUser({ Username: email, Pool: getCognitoPool() });
-  currentUser = cognitoUser;
-
-  cognitoUser.authenticateUser(authDetails, {
-    onSuccess(result) {
-      spin(false);
-      currentToken = result.getIdToken().getJwtToken();
-      showApp(email);
-    },
-    onFailure(err) {
-      spin(false);
-      document.getElementById('loginErr').textContent = err.message || 'Sign in failed.';
-    },
-    newPasswordRequired() {
-      spin(false);
-      document.getElementById('loginErr').textContent = 'Password reset required. Please contact your administrator.';
-    }
-  });
-}
-
-function logout() {
-  if (currentUser) { try { currentUser.signOut(); } catch(e) {} }
-  currentToken = null; currentUser = null;
-  document.getElementById('appShell').classList.remove('visible');
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('emailInput').value = '';
-  document.getElementById('pwInput').value    = '';
-  document.getElementById('loginErr').textContent = '';
-  document.getElementById('setupNotice').classList.remove('show');
-}
-
-function showApp(email) {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appShell').classList.add('visible');
-  document.getElementById('sbUserInfo').innerHTML =
-    `<strong>${email}</strong>Administrator`;
-  document.getElementById('topAdminBadge').textContent = awsConfigured ? 'Admin (AWS)' : 'Admin (Demo)';
-  loadAndRender();
-}
-
-/* ───────────────────────────────────────────────────────────
-   DATA LAYER  (API Gateway ↔ DynamoDB  |  fallback: localStorage)
-─────────────────────────────────────────────────────────── */
-const DEFAULT_COURSES = [
-  {
-    id: uid(), shortName: 'CBAP',
-    name: 'CBAP – Certified Business Analysis Professional',
-    badge: 'IIBA Certified', icon: '📊', iconBg: '#e6f9f7',
-    description: 'Master business analysis best practices aligned with BABOK® Guide v3.',
-    duration: '5 Days (40 Hours)', format: 'Live Online & In-Person',
-    amount: 1950, discount: 0, price: '$1,950 per participant',
-    sessions: [
-      { id: uid(), label: '07 – 11 Apr 2025', lecturer: 'TBC', quota: 20, enrolled: 0, amount: null, discount: null },
-      { id: uid(), label: '02 – 06 Jun 2025', lecturer: 'TBC', quota: 20, enrolled: 0, amount: null, discount: null },
-    ]
-  },
-  {
-    id: uid(), shortName: 'PMP',
-    name: 'PMP – Project Management Professional',
-    badge: 'PMI Certified', icon: '🏆', iconBg: '#e8f0fe',
-    description: 'The world\'s most recognized project management certification.',
-    duration: '5 Days (35 Contact Hours)', format: 'Live Online & In-Person',
-    amount: 1850, discount: 0, price: '$1,850 per participant',
-    sessions: [
-      { id: uid(), label: '14 – 18 Apr 2025', lecturer: 'TBC', quota: 20, enrolled: 0, amount: null, discount: null },
-      { id: uid(), label: '09 – 13 Jun 2025', lecturer: 'TBC', quota: 20, enrolled: 0, amount: null, discount: null },
-    ]
-  },
-  {
-    id: uid(), shortName: 'Agile',
-    name: 'Agile & Scrum Certification',
-    badge: 'Scrum & SAFe', icon: '⚡', iconBg: '#fff3e0',
-    description: 'From foundational Scrum to scaled enterprise Agile (SAFe).',
-    duration: '2 – 3 Days per course', format: 'Live Online & In-Person',
-    amount: 950, discount: 0, price: 'From $950 per participant',
-    sessions: [
-      { id: uid(), label: '22 – 23 Apr 2025 (Scrum)', lecturer: 'TBC', quota: 15, enrolled: 0, amount: null, discount: null },
-    ]
-  }
+const SEED = [
+  { id: uid(), name: 'Certified Scrum Master (CSM)', desc: 'Become a Certified ScrumMaster® and lead high-performing Agile teams.', vendor: 'Scrum Alliance', category: 'Agile', duration: '2 Days', seats: null, listPrice: null, discPrice: null, status: 'draft', published: false },
+  { id: uid(), name: 'SAFe Scrum Master', desc: 'Learn to lead and support Agile Release Trains in a SAFe enterprise.', vendor: 'Scaled Agile, Inc.', category: 'Agile', duration: '2 Days', seats: null, listPrice: null, discPrice: null, status: 'draft', published: false },
+  { id: uid(), name: 'SAFe POPM', desc: 'Master Product Owner/Product Manager skills in a scaled Agile environment.', vendor: 'Scaled Agile, Inc.', category: 'Agile', duration: '2 Days', seats: null, listPrice: null, discPrice: null, status: 'draft', published: false },
+  { id: uid(), name: 'CBAP Certification Training', desc: 'Master business analysis skills and prepare for the CBAP® exam.', vendor: 'IIBA (International Institute of Business Analysis)', category: 'Business Analysis', duration: '3 Days', seats: null, listPrice: 1500, discPrice: 500, status: 'draft', published: false },
+  { id: uid(), name: 'PMP Certification Training', desc: 'Prepare for the globally recognized PMP® certification exam.', vendor: 'PMI (Project Management Institute)', category: 'Project Management', duration: '4 Days', seats: null, listPrice: 1000, discPrice: 500, status: 'live', published: true },
 ];
 
-async function apiCall(method, path, data) {
-  const res = await fetch(AWS_CONFIG.api.endpoint + path, {
-    method,
-    headers: {
-      'Authorization':  currentToken,
-      'Content-Type':   'application/json',
-    },
-    body: data ? JSON.stringify(data) : undefined,
-  });
-  if (!res.ok) throw new Error('API error ' + res.status);
-  return res.json();
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function load() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) return JSON.parse(raw);
+  const seed = JSON.parse(JSON.stringify(SEED));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
+  return seed;
 }
 
-async function fetchCourses() {
-  if (!awsConfigured || currentToken === 'demo') {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_COURSES));
-  }
-  return apiCall('GET', '/courses');
+function save(courses) { localStorage.setItem(STORAGE_KEY, JSON.stringify(courses)); }
+
+/* ── STATE ── */
+let _courses = load();
+let _deleteId = null;
+let _currentView = 'courses';
+
+/* ── RENDER ── */
+function renderAll() {
+  renderStats();
+  renderTable();
 }
 
-async function persistCourse(course) {
-  if (!awsConfigured || currentToken === 'demo') {
-    const courses = await fetchCourses();
-    const idx = courses.findIndex(c => c.id === course.id);
-    if (idx > -1) courses[idx] = course; else courses.push(course);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
-    return course;
-  }
-  // If course already exists → PUT, otherwise → POST
-  const courses = await fetchCourses();
-  const exists = courses.find(c => c.id === course.id);
-  return apiCall(exists ? 'PUT' : 'POST', exists ? `/courses/${course.id}` : '/courses', course);
+function renderStats() {
+  const total     = _courses.length;
+  const published = _courses.filter(c => c.published).length;
+  const draft     = _courses.filter(c => !c.published).length;
+  document.getElementById('stat-total').textContent     = total;
+  document.getElementById('stat-published').textContent = published;
+  document.getElementById('stat-draft').textContent     = draft;
 }
 
-async function removeCourse(id) {
-  if (!awsConfigured || currentToken === 'demo') {
-    const courses = (await fetchCourses()).filter(c => c.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
-    return;
-  }
-  return apiCall('DELETE', `/courses/${id}`);
-}
-
-/* ───────────────────────────────────────────────────────────
-   RENDER
-─────────────────────────────────────────────────────────── */
-let _courses = [];
-
-async function loadAndRender() {
-  spin(true);
-  try {
-    _courses = await fetchCourses();
-  } catch(e) {
-    toast('Could not load courses from API. Using local data.', 'error');
-    _courses = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') ||
-               JSON.parse(JSON.stringify(DEFAULT_COURSES));
-  }
-  spin(false);
-  renderDash();
-  renderCoursesTable();
-}
-
-function showView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  const nb = document.getElementById('nav-' + name);
-  if (nb) nb.classList.add('active');
-  const titles = { dashboard: 'Dashboard', courses: 'Courses' };
-  document.getElementById('pageTitle').textContent = titles[name] || name;
-}
-
-/* Dashboard */
-function renderDash() {
-  let totalSess = 0, totalQuota = 0, totalEnr = 0, totalRev = 0;
-  _courses.forEach(c => {
-    const baseAmt = c.amount || 0;
-    const baseDsc = c.discount || 0;
-    const effAmt  = baseAmt * (1 - baseDsc / 100);
-    totalSess  += c.sessions.length;
-    c.sessions.forEach(s => {
-      totalQuota += s.quota;
-      totalEnr   += s.enrolled;
-      const amt  = (s.amount != null ? s.amount : baseAmt) * (1 - ((s.discount != null ? s.discount : baseDsc) / 100));
-      totalRev   += amt * s.enrolled;
-    });
-  });
-  document.getElementById('dashStats').innerHTML = `
-    <div class="stat-card"><div class="sc-icon">📚</div><div class="sc-label">Courses</div><div class="sc-value">${_courses.length}</div></div>
-    <div class="stat-card"><div class="sc-icon">📅</div><div class="sc-label">Sessions</div><div class="sc-value">${totalSess}</div></div>
-    <div class="stat-card"><div class="sc-icon">🪑</div><div class="sc-label">Total Seats</div><div class="sc-value">${totalQuota}</div></div>
-    <div class="stat-card"><div class="sc-icon">✅</div><div class="sc-label">Enrolled</div><div class="sc-value">${totalEnr}</div></div>
-    <div class="stat-card"><div class="sc-icon">💰</div><div class="sc-label">Est. Revenue</div><div class="sc-value">${fmtMoney(totalRev)}</div></div>
-  `;
-}
-
-/* Courses table */
-function renderCoursesTable() {
-  const tbody = document.getElementById('coursesTableBody');
+function renderTable() {
+  const tbody = document.getElementById('courseTbody');
   if (!_courses.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No courses yet. Click "Add Course" to get started.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No courses yet. Click "+ New Course" to add one.</td></tr>';
     return;
   }
   tbody.innerHTML = _courses.map(c => {
-    const totalQ = c.sessions.reduce((a, s) => a + (s.quota || 0), 0);
-    const totalE = c.sessions.reduce((a, s) => a + (s.enrolled || 0), 0);
-    const pct    = totalQ > 0 ? Math.round((totalE / totalQ) * 100) : 0;
-    const fillCls = pct >= 100 ? 'full' : pct >= 75 ? 'warn' : '';
-    const effAmt  = (c.amount || 0) * (1 - ((c.discount || 0) / 100));
-    return `
-    <tr>
-      <td class="course-name-cell">
-        <span style="font-size:1.2rem;margin-right:8px;">${c.icon || '📘'}</span>${c.name}
-        <small>${c.shortName}</small>
-      </td>
-      <td><span class="badge-pill">${c.badge}</span></td>
-      <td><span class="price-chip">${fmtMoney(c.amount)}</span></td>
-      <td>${c.discount ? c.discount + '%' : '—'}</td>
-      <td>${c.sessions.length}</td>
+    const pct = (c.listPrice && c.discPrice && c.listPrice > c.discPrice)
+      ? Math.round((1 - c.discPrice / c.listPrice) * 100) : null;
+
+    const priceHtml = c.listPrice
+      ? `<div class="price-wrap">
+           ${c.discPrice && pct ? `<span class="price-orig">$${fmt(c.listPrice)}</span>` : ''}
+           <span class="price-disc">$${fmt(c.discPrice || c.listPrice)}</span>
+           ${pct ? `<span class="price-off"> (${pct}% off)</span>` : ''}
+         </div>`
+      : `<span class="dash-col">—</span>`;
+
+    const statusHtml = c.status === 'live'
+      ? `<span class="status-badge status-live"><span class="status-dot"></span>Live</span>`
+      : `<span class="status-badge status-draft"><span class="status-dot"></span>Draft</span>`;
+
+    return `<tr>
       <td>
-        <div class="quota-bar">${totalQ}
-          <div class="quota-track"><div class="quota-fill ${fillCls}" style="width:${Math.min(pct,100)}%"></div></div>
+        <div class="course-cell">
+          <div class="course-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div>
+            <div class="course-name">${esc(c.name)}</div>
+            <div class="course-desc">${esc(c.desc || '')}</div>
+          </div>
         </div>
       </td>
-      <td>${totalE} / ${totalQ}</td>
+      <td><span class="vendor-badge" title="${esc(c.vendor || '')}">${esc(c.vendor || '—')}</span></td>
+      <td>${c.category ? `<span class="cat-badge">${esc(c.category)}</span>` : '<span class="dash-col">—</span>'}</td>
+      <td>${esc(c.duration || '—')}</td>
+      <td class="dash-col">${c.seats ? c.seats : '—'}</td>
+      <td>${priceHtml}</td>
+      <td>${statusHtml}</td>
       <td>
-        <div class="actions">
-          <button class="btn-sm btn-edit"    onclick="openCourseModal('${c.id}')">Edit</button>
-          <button class="btn-sm btn-session" onclick="openSessModal('${c.id}')">Sessions</button>
-          <button class="btn-sm btn-del"     onclick="confirmDeleteCourse('${c.id}')">Delete</button>
+        <label class="tog">
+          <input type="checkbox" ${c.published ? 'checked' : ''} onchange="togglePublished('${c.id}', this.checked)" />
+          <div class="tog-track"></div>
+          <div class="tog-thumb"></div>
+        </label>
+      </td>
+      <td>
+        <div class="action-btns">
+          <button class="act-btn" onclick="openEdit('${c.id}')" title="Edit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="act-btn del" onclick="askDelete('${c.id}')" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
         </div>
       </td>
     </tr>`;
   }).join('');
 }
 
-/* ───────────────────────────────────────────────────────────
-   COURSE MODAL
-─────────────────────────────────────────────────────────── */
-function openCourseModal(id) {
-  const c = id ? _courses.find(x => x.id === id) : null;
-  document.getElementById('courseModalTitle').textContent = c ? 'Edit Course' : 'Add Course';
-  document.getElementById('cf-id').value       = c ? c.id : '';
-  document.getElementById('cf-short').value    = c ? c.shortName   : '';
-  document.getElementById('cf-badge').value    = c ? c.badge       : '';
-  document.getElementById('cf-name').value     = c ? c.name        : '';
-  document.getElementById('cf-desc').value     = c ? c.description : '';
-  document.getElementById('cf-duration').value = c ? c.duration    : '';
-  document.getElementById('cf-format').value   = c ? c.format      : '';
-  document.getElementById('cf-amount').value   = c ? (c.amount   || '') : '';
-  document.getElementById('cf-discount').value = c ? (c.discount || '') : '';
-  document.getElementById('cf-price').value    = c ? (c.price    || '') : '';
-  document.getElementById('cf-icon').value     = c ? c.icon   : '';
-  document.getElementById('cf-iconbg').value   = c ? c.iconBg : '#e6f9f7';
-  renderSwatches(c ? c.iconBg : '#e6f9f7');
+function fmt(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── TOGGLE PUBLISHED ── */
+function togglePublished(id, val) {
+  const c = _courses.find(x => x.id === id);
+  if (!c) return;
+  c.published = val;
+  save(_courses);
+  renderStats();
+  toast(val ? 'Course published.' : 'Course unpublished.', 'ok');
+}
+
+/* ── MODAL ── */
+function openAdd() {
+  document.getElementById('modalTitle').textContent = 'New Course';
+  document.getElementById('editId').value = '';
+  clearForm();
   document.getElementById('courseOverlay').classList.add('open');
 }
 
-function renderSwatches(selected) {
-  document.getElementById('swatchList').innerHTML = SWATCHES.map(s =>
-    `<div class="swatch${s===selected?' picked':''}" style="background:${s}" title="${s}" onclick="pickSwatch('${s}')"></div>`
-  ).join('');
+function openEdit(id) {
+  const c = _courses.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('modalTitle').textContent = 'Edit Course';
+  document.getElementById('editId').value  = id;
+  document.getElementById('fName').value   = c.name || '';
+  document.getElementById('fDesc').value   = c.desc || '';
+  document.getElementById('fVendor').value = c.vendor || '';
+  document.getElementById('fCategory').value = c.category || '';
+  document.getElementById('fDuration').value = c.duration || '';
+  document.getElementById('fSeats').value    = c.seats || '';
+  document.getElementById('fListPrice').value = c.listPrice || '';
+  document.getElementById('fDiscPrice').value = c.discPrice || '';
+  document.getElementById('fStatus').value   = c.status || 'draft';
+  document.getElementById('courseOverlay').classList.add('open');
 }
-function pickSwatch(col) {
-  document.getElementById('cf-iconbg').value = col;
-  renderSwatches(col);
+
+function clearForm() {
+  ['fName','fDesc','fVendor','fDuration','fSeats','fListPrice','fDiscPrice'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('fCategory').value = '';
+  document.getElementById('fStatus').value = 'draft';
 }
-function closeCourseModal() {
+
+function closeModal() {
   document.getElementById('courseOverlay').classList.remove('open');
 }
 
-async function saveCourse() {
-  const shortName = document.getElementById('cf-short').value.trim();
-  const name      = document.getElementById('cf-name').value.trim();
-  const badge     = document.getElementById('cf-badge').value.trim();
-  const desc      = document.getElementById('cf-desc').value.trim();
-  if (!shortName || !name || !badge || !desc) {
-    toast('Please fill in all required fields.', 'error'); return;
-  }
-  const existId = document.getElementById('cf-id').value;
-  const existCourse = existId ? _courses.find(x => x.id === existId) : null;
-  const course = {
-    id:          existId || uid(),
-    shortName, name, badge, description: desc,
-    duration:    document.getElementById('cf-duration').value.trim(),
-    format:      document.getElementById('cf-format').value.trim(),
-    amount:      parseFloat(document.getElementById('cf-amount').value)   || 0,
-    discount:    parseFloat(document.getElementById('cf-discount').value) || 0,
-    price:       document.getElementById('cf-price').value.trim(),
-    icon:        document.getElementById('cf-icon').value.trim()   || '📘',
-    iconBg:      document.getElementById('cf-iconbg').value.trim() || '#e8f0fe',
-    sessions:    existCourse ? existCourse.sessions : [],
+function saveCourse() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { toast('Course name is required.', 'err'); return; }
+
+  const editId = document.getElementById('editId').value;
+  const data = {
+    name,
+    desc:      document.getElementById('fDesc').value.trim(),
+    vendor:    document.getElementById('fVendor').value.trim(),
+    category:  document.getElementById('fCategory').value,
+    duration:  document.getElementById('fDuration').value.trim(),
+    seats:     Number(document.getElementById('fSeats').value) || null,
+    listPrice: Number(document.getElementById('fListPrice').value) || null,
+    discPrice: Number(document.getElementById('fDiscPrice').value) || null,
+    status:    document.getElementById('fStatus').value,
   };
-  spin(true);
-  try {
-    await persistCourse(course);
-    const idx = _courses.findIndex(x => x.id === course.id);
-    if (idx > -1) _courses[idx] = course; else _courses.push(course);
-    closeCourseModal();
-    renderCoursesTable();
-    renderDash();
-    toast(existId ? 'Course updated.' : 'Course added.');
-  } catch(e) {
-    toast('Save failed: ' + e.message, 'error');
+
+  if (editId) {
+    const idx = _courses.findIndex(c => c.id === editId);
+    if (idx > -1) { _courses[idx] = { ..._courses[idx], ...data }; }
+  } else {
+    _courses.push({ id: uid(), published: false, ...data });
   }
-  spin(false);
+
+  save(_courses);
+  renderAll();
+  closeModal();
+  toast(editId ? 'Course updated.' : 'Course added.', 'ok');
 }
 
-/* ───────────────────────────────────────────────────────────
-   DELETE COURSE
-─────────────────────────────────────────────────────────── */
-let _pendingDelCourse = null;
-function confirmDeleteCourse(id) {
-  _pendingDelCourse = id;
+/* ── DELETE ── */
+function askDelete(id) {
   const c = _courses.find(x => x.id === id);
-  document.getElementById('confirmTitle').textContent = 'Delete Course?';
-  document.getElementById('confirmMsg').textContent   = `"${c ? c.name : ''}" and all its sessions will be permanently removed.`;
-  document.getElementById('confirmBtn').onclick = doDeleteCourse;
+  document.getElementById('confirmMsg').textContent = `Delete "${c ? c.name : 'this course'}"? This cannot be undone.`;
+  _deleteId = id;
   document.getElementById('confirmOverlay').classList.add('open');
 }
-async function doDeleteCourse() {
-  spin(true);
-  try {
-    await removeCourse(_pendingDelCourse);
-    _courses = _courses.filter(x => x.id !== _pendingDelCourse);
-    closeConfirm();
-    renderCoursesTable();
-    renderDash();
-    toast('Course deleted.', 'error');
-  } catch(e) {
-    toast('Delete failed: ' + e.message, 'error');
-  }
-  spin(false);
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  _deleteId = null;
+}
+function confirmDelete() {
+  if (!_deleteId) return;
+  _courses = _courses.filter(c => c.id !== _deleteId);
+  save(_courses);
+  renderAll();
+  closeConfirm();
+  toast('Course deleted.', 'err');
 }
 
-/* ───────────────────────────────────────────────────────────
-   SESSIONS MODAL
-─────────────────────────────────────────────────────────── */
-function openSessModal(courseId) {
-  document.getElementById('sess-course-id').value = courseId;
-  const c = _courses.find(x => x.id === courseId);
-  document.getElementById('sessModalTitle').textContent = `Sessions — ${c ? c.shortName : ''}`;
-  renderSessTable(courseId);
-  document.getElementById('sessOverlay').classList.add('open');
-}
-function closeSessModal() {
-  document.getElementById('sessOverlay').classList.remove('open');
-  renderCoursesTable();
-  renderDash();
-}
+/* ── NAVIGATION ── */
+const VIEW_TITLES = {
+  courses: 'Courses', dashboard: 'Dashboard', batches: 'Batches',
+  registrations: 'Registrations', discounts: 'Discounts', trainers: 'Trainers'
+};
 
-function renderSessTable(courseId) {
-  const c = _courses.find(x => x.id === courseId);
-  const tbody = document.getElementById('sessTableBody');
-  if (!c || !c.sessions.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px;">No sessions yet. Click "Add Session" above.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = c.sessions.map(s => {
-    const left     = (s.quota || 0) - (s.enrolled || 0);
-    const pct      = s.quota > 0 ? Math.round((s.enrolled / s.quota) * 100) : 0;
-    const spotsCls = left <= 0 ? 'spots-full' : left <= 3 ? 'spots-warn' : 'spots-ok';
-    const spotsLbl = left <= 0 ? 'FULL' : `${left} left`;
-    const dispAmt  = s.amount  != null ? fmtMoney(s.amount)  : `<span style="color:var(--muted);">Course (${fmtMoney(c.amount)})</span>`;
-    const dispDsc  = s.discount != null ? s.discount + '%'   : `<span style="color:var(--muted);">Course (${c.discount || 0}%)</span>`;
-    return `
-    <tr id="srow-${s.id}">
-      <td>${s.label || '—'}</td>
-      <td>${s.lecturer || '—'}</td>
-      <td>${s.quota}</td>
-      <td>${s.enrolled}</td>
-      <td>${dispAmt}</td>
-      <td>${dispDsc}</td>
-      <td><span class="spots-badge ${spotsCls}">${spotsLbl}</span></td>
-      <td>
-        <div class="actions">
-          <button class="btn-sm btn-edit" onclick="editSessionRow('${courseId}','${s.id}')">Edit</button>
-          <button class="btn-sm btn-del"  onclick="confirmDeleteSess('${courseId}','${s.id}')">Delete</button>
-        </div>
-      </td>
-    </tr>
-    <tr class="sess-inline-form" id="sedit-${s.id}">
-      <td colspan="8">
-        <div class="inline-fields">
-          <input class="if-date"   id="se-label-${s.id}"   type="text"   value="${s.label    || ''}" placeholder="Session date / label" />
-          <input class="if-lect"   id="se-lect-${s.id}"    type="text"   value="${s.lecturer || ''}" placeholder="Lecturer name" />
-          <input class="if-quota"  id="se-quota-${s.id}"   type="number" value="${s.quota    || 20}" placeholder="Quota"    min="1" />
-          <input class="if-enrl"   id="se-enrl-${s.id}"    type="number" value="${s.enrolled || 0}"  placeholder="Enrolled"  min="0" />
-          <input class="if-amount" id="se-amount-${s.id}"  type="number" value="${s.amount   != null ? s.amount   : ''}" placeholder="$ override" min="0" />
-          <input class="if-disc"   id="se-disc-${s.id}"    type="number" value="${s.discount != null ? s.discount : ''}" placeholder="% disc"    min="0" max="100" />
-          <button class="btn-sm btn-session" onclick="saveSessionEdit('${courseId}','${s.id}')">Save</button>
-          <button class="btn-sm btn-cancel"  onclick="cancelSessionEdit('${s.id}')">Cancel</button>
-        </div>
-        <div style="font-size:.75rem;color:var(--muted);margin-top:6px;">Leave Price/Discount blank to inherit from course defaults.</div>
-      </td>
-    </tr>`;
-  }).join('');
+function switchView(name) {
+  _currentView = name;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const viewEl = document.getElementById('view-' + name);
+  const navEl  = document.getElementById('nav-' + name);
+  if (viewEl) viewEl.classList.add('active');
+  if (navEl)  navEl.classList.add('active');
+  else document.querySelectorAll('.nav-item')[
+    ['dashboard','courses','batches','registrations','discounts','trainers'].indexOf(name)
+  ]?.classList.add('active');
+  document.getElementById('pageTitle').textContent = VIEW_TITLES[name] || name;
 }
 
-function addSessionRow() {
-  const courseId = document.getElementById('sess-course-id').value;
-  const cIdx = _courses.findIndex(x => x.id === courseId);
-  if (cIdx === -1) return;
-  const newSess = { id: uid(), label: '', lecturer: '', quota: 20, enrolled: 0, amount: null, discount: null };
-  _courses[cIdx].sessions.push(newSess);
-  renderSessTable(courseId);
-  editSessionRow(courseId, newSess.id);
+/* ── TOAST ── */
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type === 'ok' ? ' t-ok' : type === 'err' ? ' t-err' : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 2600);
 }
 
-function editSessionRow(courseId, sessId) {
-  document.querySelectorAll('.sess-inline-form.open').forEach(r => r.classList.remove('open'));
-  document.getElementById('sedit-' + sessId).classList.add('open');
-  document.getElementById('se-label-' + sessId).focus();
-}
-function cancelSessionEdit(sessId) {
-  document.getElementById('sedit-' + sessId).classList.remove('open');
-}
-
-async function saveSessionEdit(courseId, sessId) {
-  const label    = document.getElementById('se-label-'  + sessId).value.trim();
-  const lecturer = document.getElementById('se-lect-'   + sessId).value.trim();
-  const quota    = parseInt(document.getElementById('se-quota-'  + sessId).value)  || 0;
-  const enrolled = parseInt(document.getElementById('se-enrl-'   + sessId).value)  || 0;
-  const amtRaw   = document.getElementById('se-amount-' + sessId).value.trim();
-  const dscRaw   = document.getElementById('se-disc-'   + sessId).value.trim();
-  if (!label) { toast('Session label cannot be empty.', 'error'); return; }
-
-  const cIdx = _courses.findIndex(x => x.id === courseId);
-  const sIdx = _courses[cIdx].sessions.findIndex(s => s.id === sessId);
-  _courses[cIdx].sessions[sIdx] = {
-    ..._courses[cIdx].sessions[sIdx],
-    label, lecturer, quota, enrolled,
-    amount:   amtRaw !== '' ? parseFloat(amtRaw)  : null,
-    discount: dscRaw !== '' ? parseFloat(dscRaw)  : null,
-  };
-
-  spin(true);
-  try {
-    await persistCourse(_courses[cIdx]);
-    renderSessTable(courseId);
-    toast('Session saved.');
-  } catch(e) {
-    toast('Save failed: ' + e.message, 'error');
-  }
-  spin(false);
-}
-
-let _pendingDelSess = null, _pendingDelSessCourse = null;
-function confirmDeleteSess(courseId, sessId) {
-  _pendingDelSess = sessId; _pendingDelSessCourse = courseId;
-  const c = _courses.find(x => x.id === courseId);
-  const s = c && c.sessions.find(x => x.id === sessId);
-  document.getElementById('confirmTitle').textContent = 'Delete Session?';
-  document.getElementById('confirmMsg').textContent   = `"${s ? s.label : ''}" will be removed from ${c ? c.shortName : ''}.`;
-  document.getElementById('confirmBtn').onclick = doDeleteSess;
-  document.getElementById('confirmOverlay').classList.add('open');
-}
-async function doDeleteSess() {
-  const cIdx = _courses.findIndex(x => x.id === _pendingDelSessCourse);
-  _courses[cIdx].sessions = _courses[cIdx].sessions.filter(s => s.id !== _pendingDelSess);
-  spin(true);
-  try {
-    await persistCourse(_courses[cIdx]);
-    closeConfirm();
-    renderSessTable(_pendingDelSessCourse);
-    toast('Session deleted.', 'error');
-  } catch(e) {
-    toast('Delete failed: ' + e.message, 'error');
-  }
-  spin(false);
-}
-
-/* ───────────────────────────────────────────────────────────
-   CONFIRM + BACKDROP
-─────────────────────────────────────────────────────────── */
-function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
-
-['courseOverlay','sessOverlay','confirmOverlay'].forEach(id => {
+/* ── BACKDROP CLOSE ── */
+['courseOverlay','confirmOverlay'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) {
     if (e.target === this) {
-      if      (id === 'confirmOverlay') closeConfirm();
-      else if (id === 'courseOverlay')  closeCourseModal();
-      else if (id === 'sessOverlay')    closeSessModal();
+      if (id === 'confirmOverlay') closeConfirm(); else closeModal();
     }
   });
 });
 
-/* ── Init ── */
-renderSwatches('#e6f9f7');
-
-/* ── TEMP: bypass login until credentials are configured ── */
-currentToken = 'demo';
-document.getElementById('setupNotice').style.display = 'none';
-showApp('admin@synaptiv.com');
+/* ── INIT ── */
+renderAll();
 </script>
 </body>
 </html>
