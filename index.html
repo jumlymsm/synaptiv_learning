@@ -131,10 +131,92 @@
     .spots-warn { color: #b45309; }
     .spots-full { color: #e53935; }
 
+    /* ── Course Finder ──────────────────────────────────────── */
+    .finder { background: #fff; padding: 72px 24px; }
+    .finder-inner { max-width: 780px; margin: 0 auto; }
+    .finder-inner .section-label { text-align: center; }
+    .finder-inner .section-title { text-align: center; }
+    .finder-inner .section-sub { text-align: center; margin-left: auto; margin-right: auto; margin-bottom: 40px; }
+
+    /* progress bar */
+    .finder-progress { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 40px; }
+    .fp-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .fp-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #d5dce8; background: #fff; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; color: var(--muted); transition: all .3s; }
+    .fp-circle.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .fp-circle.done { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .fp-label { font-size: .72rem; color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .fp-label.active { color: var(--teal); }
+    .fp-line { flex: 1; height: 2px; background: #d5dce8; min-width: 48px; max-width: 80px; margin-bottom: 20px; transition: background .3s; }
+    .fp-line.done { background: var(--teal); }
+
+    /* steps */
+    .finder-step { display: none; }
+    .finder-step.active { display: block; }
+
+    /* objective cards */
+    .obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .obj-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px 18px; cursor: pointer; transition: all .2s; display: flex; align-items: flex-start; gap: 14px; }
+    .obj-card:hover { border-color: var(--teal); background: #f0faf9; }
+    .obj-card.selected { border-color: var(--teal); background: #e6f9f7; }
+    .obj-card.selected .obj-check { background: var(--teal); border-color: var(--teal); }
+    .obj-card.selected .obj-check::after { display: block; }
+    .obj-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .obj-card.selected .obj-icon { background: rgba(0,181,163,.15); }
+    .obj-text h4 { font-size: .92rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .obj-text p  { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+    .obj-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d5dce8; margin-left: auto; flex-shrink: 0; position: relative; transition: all .2s; margin-top: 2px; }
+    .obj-check::after { content: '✓'; display: none; position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: .65rem; font-weight: 800; color: #fff; line-height: 16px; text-align: center; }
+    .obj-card.selected .obj-check::after { display: flex; }
+
+    /* experience buttons */
+    .exp-grid { display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; }
+    .exp-btn { flex: 1; min-width: 140px; border: 2px solid #e2e8f0; border-radius: 10px; padding: 18px 14px; cursor: pointer; background: #fff; text-align: center; transition: all .2s; }
+    .exp-btn:hover { border-color: var(--teal); background: #f0faf9; }
+    .exp-btn.selected { border-color: var(--teal); background: #e6f9f7; }
+    .exp-btn strong { display: block; font-size: .93rem; color: var(--dark); font-weight: 700; margin-bottom: 3px; }
+    .exp-btn span { font-size: .76rem; color: var(--muted); }
+
+    /* recommendation result */
+    .rec-card { border: 2px solid #f59e0b; border-radius: 14px; padding: 24px; background: #fff; display: flex; gap: 24px; align-items: center; margin-bottom: 20px; }
+    .rec-badge { display: inline-block; background: #f59e0b; color: #fff; font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .rec-name { font-size: 1.15rem; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+    .rec-desc { font-size: .85rem; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .rec-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .rec-tag { display: inline-flex; align-items: center; gap: 4px; font-size: .75rem; color: var(--muted); background: var(--light); padding: 3px 10px; border-radius: 20px; }
+    .rec-tag::before { content: '✓'; color: var(--teal); font-weight: 700; }
+    .rec-price-box { text-align: right; flex-shrink: 0; min-width: 130px; }
+    .rec-label { font-size: .72rem; color: var(--muted); margin-bottom: 2px; }
+    .rec-original { font-size: .82rem; color: #aaa; text-decoration: line-through; }
+    .rec-price { font-size: 1.8rem; font-weight: 800; color: var(--dark); margin: 2px 0 14px; }
+    .btn-rec-enroll { background: var(--grad); color: #fff; border: none; border-radius: 8px; padding: 12px 24px; font-size: .93rem; font-weight: 700; cursor: pointer; width: 100%; transition: opacity .2s; }
+    .btn-rec-enroll:hover { opacity: .88; }
+    .rec-other { font-size: .82rem; color: var(--muted); text-align: center; }
+    .rec-other a { color: var(--teal); text-decoration: none; font-weight: 600; }
+
+    /* nav buttons */
+    .finder-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .btn-finder-next { background: var(--grad); color: #fff; border: none; border-radius: 8px; padding: 12px 32px; font-size: .95rem; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-finder-next:hover { opacity: .88; }
+    .btn-finder-next:disabled { background: #c0ccd8; cursor: not-allowed; }
+    .btn-finder-back { background: none; border: none; color: var(--muted); font-size: .9rem; cursor: pointer; padding: 8px 0; font-weight: 600; }
+    .btn-finder-back:hover { color: var(--dark); }
+    .finder-restart { display: block; text-align: center; margin-top: 16px; font-size: .83rem; color: var(--muted); cursor: pointer; background: none; border: none; font-weight: 600; }
+    .finder-restart:hover { color: var(--teal); }
+
+    /* progress line at bottom (step 3) */
+    .journey-bar { margin-top: 28px; }
+    .journey-track { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .journey-fill { height: 100%; background: var(--grad); border-radius: 3px; }
+    .journey-label { text-align: right; font-size: .75rem; color: var(--muted); margin-top: 5px; font-weight: 600; }
+
     @media (max-width: 680px) {
       .nav-links { display: none; }
       .hero { padding: 64px 20px 56px; }
       .stats-inner { gap: 14px; }
+      .obj-grid { grid-template-columns: 1fr; }
+      .exp-grid { flex-direction: column; }
+      .rec-card { flex-direction: column; gap: 16px; }
+      .rec-price-box { text-align: left; width: 100%; }
     }
   </style>
 </head>
@@ -177,6 +259,109 @@
     <div class="stat"><div class="stat-num">10+</div><div class="stat-lbl">Years of Excellence</div></div>
   </div>
 </div>
+
+<!-- COURSE FINDER -->
+<section class="finder" id="finder">
+  <div class="finder-inner">
+    <div class="section-label">Find Your Path</div>
+    <h2 class="section-title">Which Course is Right for You?</h2>
+    <p class="section-sub">Answer 2 quick questions and we'll match you to the best program.</p>
+
+    <!-- Progress -->
+    <div class="finder-progress">
+      <div class="fp-step">
+        <div class="fp-circle active" id="fp1">1</div>
+        <div class="fp-label active" id="fl1">Objectives</div>
+      </div>
+      <div class="fp-line" id="fline1"></div>
+      <div class="fp-step">
+        <div class="fp-circle" id="fp2">2</div>
+        <div class="fp-label" id="fl2">Experience</div>
+      </div>
+      <div class="fp-line" id="fline2"></div>
+      <div class="fp-step">
+        <div class="fp-circle" id="fp3">3</div>
+        <div class="fp-label" id="fl3">Your Match</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Objectives -->
+    <div class="finder-step active" id="fstep1">
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px;font-weight:600;">Select all that apply</p>
+      <div class="obj-grid">
+        <div class="obj-card" data-obj="pm" onclick="toggleObj(this)">
+          <div class="obj-icon">📋</div>
+          <div class="obj-text">
+            <h4>Lead Projects as a PM</h4>
+            <p>Deliver complex projects on time and budget</p>
+          </div>
+          <div class="obj-check"></div>
+        </div>
+        <div class="obj-card" data-obj="ba" onclick="toggleObj(this)">
+          <div class="obj-icon">📊</div>
+          <div class="obj-text">
+            <h4>Become a Business Analyst</h4>
+            <p>Bridge the gap between business and IT</p>
+          </div>
+          <div class="obj-check"></div>
+        </div>
+        <div class="obj-card" data-obj="agile" onclick="toggleObj(this)">
+          <div class="obj-icon">⚡</div>
+          <div class="obj-text">
+            <h4>Master Agile &amp; Scrum</h4>
+            <p>Drive team agility and fast delivery</p>
+          </div>
+          <div class="obj-check"></div>
+        </div>
+        <div class="obj-card" data-obj="scale" onclick="toggleObj(this)">
+          <div class="obj-icon">🏢</div>
+          <div class="obj-text">
+            <h4>Scale Agile Across My Org</h4>
+            <p>Transform enterprise delivery frameworks</p>
+          </div>
+          <div class="obj-check"></div>
+        </div>
+      </div>
+      <div class="finder-nav">
+        <span></span>
+        <button class="btn-finder-next" id="nextBtn1" onclick="goStep(2)" disabled>Next &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Experience -->
+    <div class="finder-step" id="fstep2">
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px;font-weight:600;">Select one</p>
+      <div class="exp-grid">
+        <button class="exp-btn" data-exp="beginner" onclick="selectExp(this)">
+          <strong>Just starting out</strong>
+          <span>0 &ndash; 2 years</span>
+        </button>
+        <button class="exp-btn" data-exp="mid" onclick="selectExp(this)">
+          <strong>Have some experience</strong>
+          <span>3 &ndash; 5 years</span>
+        </button>
+        <button class="exp-btn" data-exp="advanced" onclick="selectExp(this)">
+          <strong>Seeking advanced cert</strong>
+          <span>5+ years</span>
+        </button>
+      </div>
+      <div class="finder-nav">
+        <button class="btn-finder-back" onclick="goStep(1)">&larr; Back</button>
+        <button class="btn-finder-next" id="nextBtn2" onclick="goStep(3)" disabled>See My Match &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Recommendation -->
+    <div class="finder-step" id="fstep3">
+      <div id="recResult"></div>
+      <button class="finder-restart" onclick="restartFinder()">&#8635; Start over</button>
+      <div class="journey-bar">
+        <div class="journey-track"><div class="journey-fill" style="width:100%"></div></div>
+        <div class="journey-label">Journey Complete</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- COURSES -->
 <section id="courses">
@@ -447,6 +632,132 @@ function submitForm(e) {
 
 /* ── Init ───────────────────────────────────────────────────── */
 renderCards();
+
+/* ── Course Finder ──────────────────────────────────────────── */
+const FINDER_COURSES = [
+  {
+    id: 'pmp',
+    name: 'PMP Certification Training',
+    desc: 'The world\'s most recognized project management certification. Covers predictive, agile, and hybrid approaches.',
+    tags: ['35 Contact Hours', 'Exam Simulator', 'Pass Guarantee'],
+    price: '$1,850', original: '$2,200',
+    objs: ['pm'],
+    levels: ['mid', 'advanced'],
+  },
+  {
+    id: 'cbap',
+    name: 'CBAP Certification Training',
+    desc: 'Master business analysis best practices aligned with BABOK® Guide v3. For senior BAs with 5+ years experience.',
+    tags: ['40 Hours CDUs', 'IIBA Endorsed', 'Mock Exams'],
+    price: '$1,950', original: '$2,400',
+    objs: ['ba'],
+    levels: ['advanced'],
+  },
+  {
+    id: 'agile',
+    name: 'Agile & Scrum Certification Programs',
+    desc: 'From foundational Scrum to scaled enterprise Agile (SAFe). Lead agile teams and deliver value iteratively.',
+    tags: ['2-3 Days', 'SAFe & Scrum', 'Live Online'],
+    price: 'From $950', original: '$1,200',
+    objs: ['agile', 'scale'],
+    levels: ['beginner', 'mid', 'advanced'],
+  },
+];
+
+let finderObjs = [];
+let finderExp  = null;
+
+function toggleObj(card) {
+  const obj = card.dataset.obj;
+  card.classList.toggle('selected');
+  if (card.classList.contains('selected')) {
+    if (!finderObjs.includes(obj)) finderObjs.push(obj);
+  } else {
+    finderObjs = finderObjs.filter(o => o !== obj);
+  }
+  document.getElementById('nextBtn1').disabled = finderObjs.length === 0;
+}
+
+function selectExp(btn) {
+  document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  finderExp = btn.dataset.exp;
+  document.getElementById('nextBtn2').disabled = false;
+}
+
+function goStep(n) {
+  document.querySelectorAll('.finder-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('fstep' + n).classList.add('active');
+  // Update progress indicators
+  [1,2,3].forEach(i => {
+    const circle = document.getElementById('fp'  + i);
+    const label  = document.getElementById('fl'  + i);
+    if (i < n) {
+      circle.classList.add('done');    circle.classList.remove('active');
+      label.classList.remove('active');
+    } else if (i === n) {
+      circle.classList.add('active');  circle.classList.remove('done');
+      label.classList.add('active');
+    } else {
+      circle.classList.remove('active', 'done');
+      label.classList.remove('active');
+    }
+  });
+  [1,2].forEach(i => {
+    const line = document.getElementById('fline' + i);
+    if (line) line.classList.toggle('done', i < n);
+  });
+  if (n === 3) buildRecommendation();
+}
+
+function buildRecommendation() {
+  // Score each course: +2 per matching obj, +1 if level matches
+  const scored = FINDER_COURSES.map(c => {
+    let score = 0;
+    finderObjs.forEach(o => { if (c.objs.includes(o)) score += 2; });
+    if (finderExp && c.levels.includes(finderExp)) score += 1;
+    return { ...c, score };
+  }).filter(c => c.score > 0).sort((a, b) => b.score - a.score);
+
+  const best   = scored[0] || FINDER_COURSES[2]; // fallback to Agile
+  const others = scored.slice(1);
+
+  const otherHtml = others.length
+    ? `<p class="rec-other">Also consider: ${others.map(c =>
+        `<a href="#courses">${c.name.split(' ').slice(0,2).join(' ')}</a>`
+      ).join(', ')}</p>`
+    : '';
+
+  document.getElementById('recResult').innerHTML = `
+    <div class="rec-card">
+      <div style="flex:1">
+        <span class="rec-badge">&#9733; Best match</span>
+        <div class="rec-name">${best.name}</div>
+        <p class="rec-desc">${best.desc}</p>
+        <div class="rec-tags">
+          ${best.tags.map(t => `<span class="rec-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="rec-price-box">
+        <div class="rec-label">Tuition</div>
+        <div class="rec-original">${best.original}</div>
+        <div class="rec-price">${best.price}</div>
+        <button class="btn-rec-enroll" onclick="openModal('${best.id}')">Enroll Now</button>
+      </div>
+    </div>
+    ${otherHtml}
+  `;
+}
+
+function restartFinder() {
+  finderObjs = [];
+  finderExp  = null;
+  document.querySelectorAll('.obj-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('nextBtn1').disabled = true;
+  document.getElementById('nextBtn2').disabled = true;
+  goStep(1);
+}
 </script>
 </body>
 </html>
