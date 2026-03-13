@@ -116,7 +116,7 @@
     .sb-user strong { display: block; color: #fff; font-size: .82rem; margin-bottom: 1px; }
 
     /* ── MAIN ────────────────────────────────────────────── */
-    .main { margin-left: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; }
+    .main { margin-left: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; width: calc(100% - var(--sidebar)); }
     .topbar {
       background: #fff; height: 64px; border-bottom: 1px solid #e2e8f0;
       display: flex; align-items: center; justify-content: space-between;
@@ -1085,6 +1085,11 @@ function closeConfirm() { document.getElementById('confirmOverlay').classList.re
 
 /* ── Init ── */
 renderSwatches('#e6f9f7');
+
+/* ── TEMP: bypass login until credentials are configured ── */
+currentToken = 'demo';
+document.getElementById('setupNotice').style.display = 'none';
+showApp('admin@synaptiv.com');
 </script>
 </body>
 </html>
