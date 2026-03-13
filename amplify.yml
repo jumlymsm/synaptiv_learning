@@ -3,9 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd admin-app && npm ci
+        - node --version
+        - cd admin-app && npm ci --legacy-peer-deps
     build:
       commands:
+        - mkdir -p portal
         - cd admin-app && npm run build
   artifacts:
     baseDirectory: /
