@@ -1,139 +1,122 @@
-import type { CourseBatch, CourseBatchInput } from '../types'
+import type { Course, CourseInput } from '../types'
 
-const STORAGE_KEY = 'synaptiv_course_batches'
-const SEED_KEY = 'synaptiv_seeded'
+const STORAGE_KEY = 'synaptiv_courses_v3'
 
-const seedData: CourseBatch[] = [
+function uid(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
+}
+
+const SEED: Course[] = [
   {
-    id: 'seed-001',
-    programName: 'CBAP Certification',
-    courseCode: 'CBAP-APR-2025',
-    trainerName: 'Sarah Mitchell',
-    startDate: '2025-04-14',
-    endDate: '2025-04-18',
-    listPrice: 2500,
-    discountedPrice: 2100,
-    discountStartDate: '2025-03-01',
-    discountEndDate: '2025-04-01',
-    currency: 'USD',
-    maxSeats: 20,
-    createdAt: new Date('2025-01-15T10:00:00Z').toISOString(),
-    updatedAt: new Date('2025-01-15T10:00:00Z').toISOString(),
+    id: uid(),
+    courseName: 'Certified Scrum Master (CSM)',
+    shortDescription: 'Become a Certified ScrumMaster® and lead high-performing Agile teams.',
+    vendor: 'Scrum Alliance',
+    category: 'Agile',
+    duration: '2 Days',
+    seatCapacity: undefined,
+    listPrice: undefined,
+    discountedPrice: undefined,
+    urlSlug: 'certified-scrum-master-csm',
+    published: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
-    id: 'seed-002',
-    programName: 'PMP Certification',
-    courseCode: 'PMP-JUN-2025',
-    trainerName: 'James Okafor',
-    startDate: '2025-06-09',
-    endDate: '2025-06-13',
-    listPrice: 3200,
-    discountedPrice: 2800,
-    discountStartDate: '2025-04-15',
-    discountEndDate: '2025-05-31',
-    currency: 'USD',
-    maxSeats: 18,
-    createdAt: new Date('2025-02-01T09:00:00Z').toISOString(),
-    updatedAt: new Date('2025-02-01T09:00:00Z').toISOString(),
+    id: uid(),
+    courseName: 'SAFe Scrum Master',
+    shortDescription: 'Learn to lead and support Agile Release Trains in a SAFe enterprise.',
+    vendor: 'Scaled Agile, Inc.',
+    category: 'Agile',
+    duration: '2 Days',
+    urlSlug: 'safe-scrum-master',
+    published: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
-    id: 'seed-003',
-    programName: 'Certified Scrum Master (CSM)',
-    courseCode: 'CSM-MAY-2025',
-    trainerName: 'Linda Chen',
-    startDate: '2025-05-19',
-    endDate: '2025-05-20',
-    listPrice: 1800,
-    discountedPrice: 1800,
-    discountStartDate: '',
-    discountEndDate: '',
-    currency: 'USD',
-    maxSeats: 25,
-    createdAt: new Date('2025-02-10T08:00:00Z').toISOString(),
-    updatedAt: new Date('2025-02-10T08:00:00Z').toISOString(),
+    id: uid(),
+    courseName: 'SAFe POPM',
+    shortDescription: 'Master Product Owner/Product Manager skills in a scaled Agile environment.',
+    vendor: 'Scaled Agile, Inc.',
+    category: 'Agile',
+    duration: '2 Days',
+    urlSlug: 'safe-popm',
+    published: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: uid(),
+    courseName: 'CBAP Certification Training',
+    shortDescription: 'Master business analysis skills and prepare for the CBAP® exam.',
+    vendor: 'IIBA (International Institute of Business Analysis)',
+    category: 'Business Analysis',
+    duration: '3 Days',
+    listPrice: 1500,
+    discountedPrice: 500,
+    urlSlug: 'cbap-certification-training',
+    published: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: uid(),
+    courseName: 'PMP Certification Training',
+    shortDescription: 'Prepare for the globally recognized PMP® certification exam.',
+    vendor: 'PMI (Project Management Institute)',
+    category: 'Project Management',
+    duration: '4 Days',
+    listPrice: 1000,
+    discountedPrice: 500,
+    urlSlug: 'pmp-certification-training',
+    published: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ]
 
-function loadFromStorage(): CourseBatch[] {
-  if (!localStorage.getItem(SEED_KEY)) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData))
-    localStorage.setItem(SEED_KEY, 'true')
-  }
+function loadAll(): Course[] {
   const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return []
-  try {
-    return JSON.parse(raw) as CourseBatch[]
-  } catch {
-    return []
+  if (raw) {
+    try { return JSON.parse(raw) as Course[] } catch { /* fall through */ }
   }
+  const seed = JSON.parse(JSON.stringify(SEED)) as Course[]
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(seed))
+  return seed
 }
 
-function saveToStorage(batches: CourseBatch[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(batches))
+function saveAll(courses: Course[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(courses))
 }
 
-export async function getCourseBatches(): Promise<CourseBatch[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(loadFromStorage())
-    }, 120)
-  })
+export async function getCourses(): Promise<Course[]> {
+  return loadAll()
 }
 
-export async function createCourseBatch(input: CourseBatchInput): Promise<CourseBatch> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const batches = loadFromStorage()
-      const now = new Date().toISOString()
-      const newBatch: CourseBatch = {
-        ...input,
-        id: crypto.randomUUID(),
-        createdAt: now,
-        updatedAt: now,
-      }
-      batches.push(newBatch)
-      saveToStorage(batches)
-      resolve(newBatch)
-    }, 200)
-  })
+export async function createCourse(input: CourseInput): Promise<Course> {
+  const courses = loadAll()
+  const now = new Date().toISOString()
+  const course: Course = { id: uid(), ...input, createdAt: now, updatedAt: now }
+  courses.push(course)
+  saveAll(courses)
+  return course
 }
 
-export async function updateCourseBatch(
-  id: string,
-  input: Partial<CourseBatchInput>,
-): Promise<CourseBatch> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const batches = loadFromStorage()
-      const index = batches.findIndex((b) => b.id === id)
-      if (index === -1) {
-        reject(new Error(`Course batch with id "${id}" not found`))
-        return
-      }
-      const updated: CourseBatch = {
-        ...batches[index],
-        ...input,
-        updatedAt: new Date().toISOString(),
-      }
-      batches[index] = updated
-      saveToStorage(batches)
-      resolve(updated)
-    }, 200)
-  })
+export async function updateCourse(id: string, input: Partial<CourseInput>): Promise<Course> {
+  const courses = loadAll()
+  const idx = courses.findIndex((c) => c.id === id)
+  if (idx === -1) throw new Error('Course not found')
+  courses[idx] = { ...courses[idx], ...input, updatedAt: new Date().toISOString() }
+  saveAll(courses)
+  return courses[idx]
 }
 
-export async function deleteCourseBatch(id: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const batches = loadFromStorage()
-      const index = batches.findIndex((b) => b.id === id)
-      if (index === -1) {
-        reject(new Error(`Course batch with id "${id}" not found`))
-        return
-      }
-      batches.splice(index, 1)
-      saveToStorage(batches)
-      resolve()
-    }, 200)
-  })
+export async function deleteCourse(id: string): Promise<void> {
+  const courses = loadAll().filter((c) => c.id !== id)
+  saveAll(courses)
+}
+
+export async function togglePublish(id: string, published: boolean): Promise<Course> {
+  return updateCourse(id, { published })
 }

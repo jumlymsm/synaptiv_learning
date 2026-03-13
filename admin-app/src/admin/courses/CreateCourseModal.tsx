@@ -2,40 +2,35 @@ import { useState } from 'react'
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '../../components/ui/dialog'
 import { Button } from '../../components/ui/button'
 import CourseForm from './CourseForm'
-import type { Course, CourseInput } from '../../types'
+import type { CourseInput } from '../../types'
 
-interface EditCourseModalProps {
-  course: Course | null
+interface CreateCourseModalProps {
   open: boolean
   onClose: () => void
-  onSaved: (id: string, data: Partial<CourseInput>) => Promise<void>
+  onCreated: (data: CourseInput) => Promise<void>
 }
 
-export default function EditCourseModal({ course, open, onClose, onSaved }: EditCourseModalProps) {
+export default function CreateCourseModal({ open, onClose, onCreated }: CreateCourseModalProps) {
   const [formData, setFormData] = useState<CourseInput | null>(null)
   const [formValid, setFormValid] = useState(false)
   const [saving, setSaving] = useState(false)
 
   async function handleSave() {
-    if (!course || !formData || !formValid) return
+    if (!formData || !formValid) return
     setSaving(true)
     try {
-      await onSaved(course.id, formData)
+      await onCreated(formData)
       onClose()
     } finally {
       setSaving(false)
     }
   }
 
-  if (!course) return null
-
   return (
     <Dialog open={open} onClose={onClose} className="max-w-xl">
-      <DialogHeader title="Edit Course" onClose={onClose} />
+      <DialogHeader title="New Course" onClose={onClose} />
       <DialogBody>
         <CourseForm
-          key={course.id}
-          initial={course}
           onChange={(data, valid) => {
             setFormData(data)
             setFormValid(valid)
@@ -45,7 +40,7 @@ export default function EditCourseModal({ course, open, onClose, onSaved }: Edit
       <DialogFooter>
         <Button variant="secondary" onClick={onClose}>Cancel</Button>
         <Button onClick={handleSave} disabled={!formValid || saving}>
-          {saving ? 'Saving…' : 'Save Changes'}
+          {saving ? 'Saving…' : 'Create Course'}
         </Button>
       </DialogFooter>
     </Dialog>

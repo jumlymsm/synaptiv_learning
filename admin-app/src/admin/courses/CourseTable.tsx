@@ -1,217 +1,150 @@
-import { useState } from 'react'
-import { Pencil, Trash2, BookOpen } from 'lucide-react'
-import type { CourseBatch } from '../../types'
+import { Course } from '../../types'
+import { Badge } from '../../components/ui/badge'
+import { Switch } from '../../components/ui/switch'
+import { Button } from '../../components/ui/button'
+import { Pencil, Trash2 } from 'lucide-react'
 
 interface CourseTableProps {
-  batches: CourseBatch[]
-  onEdit: (batch: CourseBatch) => void
-  onDelete: (id: string) => void
+  courses: Course[]
+  onEdit: (course: Course) => void
+  onDelete: (course: Course) => void
+  onTogglePublish: (course: Course, published: boolean) => void
 }
 
-function formatDateRange(start: string, end: string): string {
-  if (!start && !end) return '—'
-  const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' }
-  const yearOpts: Intl.DateTimeFormatOptions = { year: 'numeric' }
-
-  const startDate = new Date(start + 'T00:00:00')
-  const endDate = end ? new Date(end + 'T00:00:00') : null
-
-  const startStr = startDate.toLocaleDateString('en-US', opts)
-  const year = startDate.toLocaleDateString('en-US', yearOpts)
-
-  if (!endDate) return `${startStr}, ${year}`
-
-  const endStr = endDate.toLocaleDateString('en-US', opts)
-  return `${startStr} – ${endStr}, ${year}`
-}
-
-function formatDiscountPeriod(start: string, end: string): string {
-  if (!start && !end) return '—'
-  const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }
-  const startStr = start ? new Date(start + 'T00:00:00').toLocaleDateString('en-US', opts) : '—'
-  const endStr = end ? new Date(end + 'T00:00:00').toLocaleDateString('en-US', opts) : '—'
-  return `${startStr} → ${endStr}`
-}
-
-function formatPrice(amount: number, currency: string): string {
-  const symbols: Record<string, string> = {
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
-    AED: 'AED ',
-    SAR: 'SAR ',
-    NGN: '₦',
-  }
-  const sym = symbols[currency] ?? currency + ' '
-  return `${sym}${amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
-}
-
-export default function CourseTable({ batches, onEdit, onDelete }: CourseTableProps) {
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
-
-  if (batches.length === 0) {
+export default function CourseTable({ courses, onEdit, onDelete, onTogglePublish }: CourseTableProps) {
+  if (courses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-          <BookOpen className="w-7 h-7 text-gray-400" />
-        </div>
-        <p className="text-base font-medium text-gray-700">No courses found.</p>
-        <p className="text-sm text-gray-400 mt-1">Add your first batch using the button above.</p>
+      <div className="py-16 text-center text-gray-400 text-sm">
+        No courses yet. Click <span className="font-medium text-gray-600">+ New Course</span> to add one.
       </div>
     )
   }
 
   return (
-    <>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Program
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Code
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Trainer
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Dates
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                List Price
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Sale Price
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Discount Period
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Seats
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {batches.map((batch) => {
-              const hasDiscount = batch.discountedPrice < batch.listPrice
-              return (
-                <tr
-                  key={batch.id}
-                  className="hover:bg-gray-50 transition-colors duration-100 group"
-                >
-                  <td className="px-4 py-3.5 max-w-[200px]">
-                    <span className="font-medium text-gray-900 block truncate">
-                      {batch.programName}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 whitespace-nowrap">
-                    <span className="font-mono text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
-                      {batch.courseCode || '—'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 whitespace-nowrap text-gray-600">
-                    {batch.trainerName || '—'}
-                  </td>
-                  <td className="px-4 py-3.5 whitespace-nowrap text-gray-600">
-                    {formatDateRange(batch.startDate, batch.endDate)}
-                  </td>
-                  <td className="px-4 py-3.5 text-right whitespace-nowrap text-gray-600">
-                    {formatPrice(batch.listPrice, batch.currency)}
-                  </td>
-                  <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                    {hasDiscount ? (
-                      <span className="font-medium text-green-600">
-                        {formatPrice(batch.discountedPrice, batch.currency)}
-                      </span>
-                    ) : (
-                      <span className="text-gray-400 text-xs">No discount</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3.5 whitespace-nowrap text-gray-500 text-xs">
-                    {batch.discountStartDate || batch.discountEndDate
-                      ? formatDiscountPeriod(batch.discountStartDate, batch.discountEndDate)
-                      : '—'}
-                  </td>
-                  <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold">
-                      {batch.maxSeats}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                    <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <button
-                        onClick={() => onEdit(batch)}
-                        className="btn-edit"
-                        title="Edit batch"
-                      >
-                        <Pencil className="w-3 h-3" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => setConfirmDeleteId(batch.id)}
-                        className="btn-danger"
-                        title="Delete batch"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b border-gray-100 bg-gray-50/60">
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Course</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Vendor</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Category</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Duration</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Seats</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Pricing</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+            <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Published</th>
+            <th className="px-4 py-3" />
+          </tr>
+        </thead>
+        <tbody>
+          {courses.map((c) => {
+            const pct =
+              c.listPrice && c.discountedPrice && c.discountedPrice < c.listPrice
+                ? Math.round((1 - c.discountedPrice / c.listPrice) * 100)
+                : null
 
-      {/* Delete Confirmation Dialog */}
-      {confirmDeleteId && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setConfirmDeleteId(null)
-          }}
-        >
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                <Trash2 className="w-5 h-5 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-gray-900">Delete Batch</h3>
-                <p className="text-sm text-gray-500">This action cannot be undone.</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete this course batch? All associated data will be
-              permanently removed.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setConfirmDeleteId(null)}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  onDelete(confirmDeleteId)
-                  setConfirmDeleteId(null)
-                }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+            return (
+              <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                {/* Course */}
+                <td className="px-4 py-3">
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <svg className="w-4 h-4 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm text-gray-900">{c.courseName}</div>
+                      {c.shortDescription && (
+                        <div className="text-xs text-gray-400 mt-0.5 max-w-[200px] truncate">{c.shortDescription}</div>
+                      )}
+                    </div>
+                  </div>
+                </td>
+
+                {/* Vendor */}
+                <td className="px-4 py-3">
+                  {c.vendor ? (
+                    <span className="inline-block border border-gray-200 rounded-full px-2.5 py-0.5 text-xs text-gray-700 max-w-[170px] truncate" title={c.vendor}>
+                      {c.vendor}
+                    </span>
+                  ) : <span className="text-gray-300">—</span>}
+                </td>
+
+                {/* Category */}
+                <td className="px-4 py-3">
+                  {c.category ? <Badge>{c.category}</Badge> : <span className="text-gray-300">—</span>}
+                </td>
+
+                {/* Duration */}
+                <td className="px-4 py-3 text-sm text-gray-700">{c.duration || <span className="text-gray-300">—</span>}</td>
+
+                {/* Seats */}
+                <td className="px-4 py-3 text-sm text-gray-700">{c.seatCapacity ? c.seatCapacity : <span className="text-gray-300">—</span>}</td>
+
+                {/* Pricing */}
+                <td className="px-4 py-3">
+                  {c.listPrice ? (
+                    <div>
+                      {pct && (
+                        <div className="text-xs text-gray-400 line-through">${c.listPrice.toLocaleString()}</div>
+                      )}
+                      <div className="text-sm font-semibold text-teal-600">
+                        ${(c.discountedPrice ?? c.listPrice).toLocaleString()}
+                        {pct && <span className="text-xs font-normal ml-1">({pct}% off)</span>}
+                      </div>
+                    </div>
+                  ) : <span className="text-gray-300">—</span>}
+                </td>
+
+                {/* Status */}
+                <td className="px-4 py-3">
+                  {c.published ? (
+                    <Badge variant="success">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-600 inline-block" />
+                      Live
+                    </Badge>
+                  ) : (
+                    <Badge variant="draft">
+                      <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      Draft
+                    </Badge>
+                  )}
+                </td>
+
+                {/* Published toggle */}
+                <td className="px-4 py-3">
+                  <Switch
+                    checked={c.published ?? false}
+                    onCheckedChange={(v) => onTogglePublish(c, v)}
+                  />
+                </td>
+
+                {/* Actions */}
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="p-1.5" onClick={() => onEdit(c)}>
+                      <Pencil className="w-3.5 h-3.5 text-gray-500" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-1.5 text-red-500 hover:bg-red-50"
+                      onClick={() => onDelete(c)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }

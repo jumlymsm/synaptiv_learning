@@ -1,18 +1,24 @@
-export interface CourseBatch {
+export interface Course {
   id: string
-  programName: string
-  courseCode: string
-  trainerName: string
-  startDate: string
-  endDate: string
-  listPrice: number
-  discountedPrice: number
-  discountStartDate: string
-  discountEndDate: string
-  currency: string
-  maxSeats: number
-  createdAt: string
-  updatedAt: string
+  courseName: string
+  vendor: string
+  category: string
+  duration?: string
+  seatCapacity?: number
+  listPrice?: number
+  discountedPrice?: number
+  badgeLogoUrl?: string
+  shortDescription?: string
+  fullDescription?: string
+  learningObjectives?: string
+  curriculumOverview?: string
+  targetAudience?: string
+  certificationDetails?: string
+  trainerProfile?: string
+  urlSlug?: string
+  published?: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
-export type CourseBatchInput = Omit<CourseBatch, 'id' | 'createdAt' | 'updatedAt'>
+export type CourseInput = Omit<Course, 'id' | 'createdAt' | 'updatedAt'>
