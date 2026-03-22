@@ -8,7 +8,7 @@ frontend:
     build:
       commands:
         - mkdir -p portal
-        - cd admin-app && npm run build
+        - cd admin-app && npx vite build
   artifacts:
     baseDirectory: /
     files:
